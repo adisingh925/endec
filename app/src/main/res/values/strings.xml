@@ -1,24 +1,13 @@
 <resources>
     <string name="app_name">endec</string>
-    <string name="title_activity_settings">SettingsActivity</string>
-
-    <!-- Preference Titles -->
-    <string name="pbe_algorithm">Algorithm</string>
+    <string name="pbe_algorithm_header">Algorithm</string>
     <string name="parameters_header">Parameters</string>
-
-    <!-- Messages Preferences -->
-    <string name="algorithm_title">KDF Algorithm</string>
+    <string name="kdf_algorithm_title">KDF Algorithm</string>
     <string name="password_title">Password</string>
     <string name="salt_title">Salt</string>
+    <string name="memory_requirement_title">Memory Requirement(in KiB)</string>
+    <string name="iteration_count_title">Iteration Count</string>
 
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="memory_requirement">Memory Requirement(in KiB)</string>
-    <string name="iteration_count">Iteration Count
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string-array name="pbe_algorithms_list">
         <item>Argon2</item>
@@ -32,6 +21,24 @@
         <item>2</item>
     </string-array>
 
-    <string name="default_salt">0123456789abcdef</string>
+    <!-- Important -->
+    <integer name="default_memory_cost">10000</integer>
+    <integer name="default_iteration">10</integer>
     <string name="default_password">password</string>
+    <string name="default_salt">0123456789abcdef</string>
+    <integer name="default_algorithm">0</integer>
+    <integer name="maximum_memory_cost">65000</integer>
+    <integer name="maximum_iteration">65000</integer>
+
+    <!-- keys -->
+    <string name="algorithm">algorithm</string>
+    <string name="password">password</string>
+    <string name="salt">salt</string>
+    <string name="memory_cost">memory_cost</string>
+    <string name="iteration">iteration</string>
+
+    <!--boolean -->
+    <bool name="True">true</bool>
+    <bool name="False">false</bool>
+
 </resources>

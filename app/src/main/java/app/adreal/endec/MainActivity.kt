@@ -2,6 +2,7 @@ package app.adreal.endec
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import app.adreal.endec.SharedPreferences.SharedPreferences
 
 class MainActivity : AppCompatActivity() {

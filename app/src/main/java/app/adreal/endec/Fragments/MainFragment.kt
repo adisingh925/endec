@@ -7,13 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import app.adreal.endec.Encryption.Encryption
 import app.adreal.endec.R
 import app.adreal.endec.ViewModel.MainViewModel
 import app.adreal.endec.databinding.FragmentMainBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class MainFragment : Fragment() {

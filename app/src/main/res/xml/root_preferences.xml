@@ -1,46 +1,48 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="@string/pbe_algorithm">
+    <PreferenceCategory app:title="@string/pbe_algorithm_header">
 
         <ListPreference
-            app:key="algorithm"
-            app:title="@string/algorithm_title"
+            app:key="@string/algorithm"
+            app:title="@string/kdf_algorithm_title"
             app:entries="@array/pbe_algorithms_list"
             app:entryValues="@array/pbe_algorithms_list_values"
-            app:defaultValue="0"
-            app:enabled="false"
-            app:useSimpleSummaryProvider="true" />
+            app:defaultValue="@integer/default_algorithm"
+            app:enabled="@bool/False"
+            app:useSimpleSummaryProvider="@bool/True" />
 
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/parameters_header">
 
         <EditTextPreference
-            app:key="password"
+            app:key="@string/password"
             app:defaultValue="@string/default_password"
             app:title="@string/password_title"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="@bool/True" />
 
         <EditTextPreference
-            app:key="salt"
+            app:key="@string/salt"
             app:defaultValue="@string/default_salt"
             app:title="@string/salt_title"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="@bool/True" />
 
         <SeekBarPreference
-            app:key="memory_iteration"
-            app:defaultValue="10"
-            app:showSeekBarValue="true"
-            android:max="65000"
-            app:title="@string/memory_requirement" />
+            app:key="@string/memory_cost"
+            app:showSeekBarValue="@bool/True"
+            android:max="@integer/maximum_memory_cost"
+            app:min="@integer/default_memory_cost"
+            app:defaultValue="@integer/default_memory_cost"
+            app:title="@string/memory_requirement_title" />
 
         <SeekBarPreference
-            app:key="iteration_count"
-            app:defaultValue="10"
-            app:showSeekBarValue="true"
-            android:max="65000"
-            app:title="@string/iteration_count" />
+            app:key="@string/iteration"
+            app:defaultValue="@integer/default_iteration"
+            app:showSeekBarValue="@bool/True"
+            android:max="@integer/maximum_iteration"
+            app:min="@integer/default_iteration"
+            app:title="@string/iteration_count_title" />
 
     </PreferenceCategory>
 

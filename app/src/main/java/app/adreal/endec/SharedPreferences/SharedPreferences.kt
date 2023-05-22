@@ -1,13 +1,14 @@
 package app.adreal.endec.SharedPreferences
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 
 object SharedPreferences {
 
     private lateinit var prefs: android.content.SharedPreferences
 
     fun init(context: Context) {
-        prefs = context.getSharedPreferences(context.packageName, Context.MODE_PRIVATE)
+        prefs = PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     fun read(key: String, value: String): String? {
