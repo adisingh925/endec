@@ -14,10 +14,6 @@ class Encryption(private val context: Context) {
     companion object {
         const val AES_KEY_LENGTH = 256
         const val ENCRYPTION_ALGORITHM = "AES"
-        const val PASSWORD = "password"
-        const val SALT = "salt"
-        const val ITERATION = "iteration"
-        const val MEMORY_COST = "memory_cost"
     }
 
     private val argon2 by lazy {
@@ -25,13 +21,14 @@ class Encryption(private val context: Context) {
     }
 
     private fun generateArgon2Hash(
+        argonMode: Argon2Mode,
         passwordByteArray: ByteArray,
         saltByteArray: ByteArray,
-        memoryCost : Int,
-        iteration : Int,
+        memoryCost: Int,
+        iteration: Int,
     ): Argon2KtResult {
         return argon2.hash(
-            mode = Argon2Mode.ARGON2_I,
+            mode = argonMode,
             password = passwordByteArray,
             salt = saltByteArray,
             tCostInIterations = iteration,
@@ -47,6 +44,7 @@ class Encryption(private val context: Context) {
     fun generateKeyFromArgon(): SecretKey {
         return generateAESKeyFromHash(
             generateArgon2Hash(
+                getArgonMode(),
                 getPassword(),
                 getSalt(),
                 getMemoryCost(),
@@ -56,18 +54,42 @@ class Encryption(private val context: Context) {
     }
 
     private fun getPassword(): ByteArray {
-        return SharedPreferences.read(PASSWORD, context.resources.getString(R.string.default_password)).toString().encodeToByteArray()
+        return SharedPreferences.read(
+            context.resources.getString(R.string.password),
+            context.resources.getString(R.string.default_password)
+        ).toString().encodeToByteArray()
     }
 
     private fun getSalt(): ByteArray {
-        return SharedPreferences.read(SALT, context.resources.getString(R.string.default_salt)).toString().encodeToByteArray()
+        return SharedPreferences.read(
+            context.resources.getString(R.string.salt),
+            context.resources.getString(R.string.default_salt)
+        ).toString().encodeToByteArray()
     }
 
-    private fun getIteration() : Int{
-        return SharedPreferences.read(ITERATION,context.resources.getInteger(R.integer.default_iteration)).toString().toInt()
+    private fun getIteration(): Int {
+        return SharedPreferences.read(
+            context.resources.getString(R.string.iteration),
+            context.resources.getInteger(R.integer.default_iteration)
+        ).toString().toInt()
     }
 
-    private fun getMemoryCost() : Int{
-        return SharedPreferences.read(MEMORY_COST,context.resources.getInteger(R.integer.default_memory_cost)).toString().toInt()
+    private fun getMemoryCost(): Int {
+        return SharedPreferences.read(
+            context.resources.getString(R.string.memory_cost),
+            context.resources.getInteger(R.integer.default_memory_cost)
+        ).toString().toInt()
+    }
+
+    private fun getArgonMode() : Argon2Mode{
+        return when (SharedPreferences.read(
+            context.resources.getString(R.string.mode),
+            context.resources.getString(R.string.default_argon_mode)
+        ).toString().toInt()) {
+            0 -> Argon2Mode.ARGON2_D
+            1 -> Argon2Mode.ARGON2_I
+            2 -> Argon2Mode.ARGON2_ID
+            else -> Argon2Mode.ARGON2_D
+        }
     }
 }

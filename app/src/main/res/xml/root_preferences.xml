@@ -12,6 +12,14 @@
             app:enabled="@bool/False"
             app:useSimpleSummaryProvider="@bool/True" />
 
+        <ListPreference
+            app:key="@string/mode"
+            app:title="@string/mode_title"
+            app:entries="@array/argon_mode"
+            app:entryValues="@array/argon_mode_value"
+            app:defaultValue="@string/default_argon_mode"
+            app:useSimpleSummaryProvider="@bool/True" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/parameters_header">

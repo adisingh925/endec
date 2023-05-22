@@ -7,7 +7,7 @@
     <string name="salt_title">Salt</string>
     <string name="memory_requirement_title">Memory Requirement(in KiB)</string>
     <string name="iteration_count_title">Iteration Count</string>
-
+    <string name="mode_title">Mode</string>
 
     <string-array name="pbe_algorithms_list">
         <item>Argon2</item>
@@ -21,14 +21,27 @@
         <item>2</item>
     </string-array>
 
+    <string-array name="argon_mode">
+        <item>Argon2_D</item>
+        <item>Argon2_I</item>
+        <item>Argon2_ID</item>
+    </string-array>
+
+    <string-array name="argon_mode_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <!-- Important -->
     <integer name="default_memory_cost">10000</integer>
     <integer name="default_iteration">10</integer>
     <string name="default_password">password</string>
     <string name="default_salt">0123456789abcdef</string>
     <integer name="default_algorithm">0</integer>
+    <string name="default_argon_mode">0</string>
     <integer name="maximum_memory_cost">65000</integer>
-    <integer name="maximum_iteration">65000</integer>
+    <integer name="maximum_iteration">100</integer>
 
     <!-- keys -->
     <string name="algorithm">algorithm</string>
@@ -36,6 +49,7 @@
     <string name="salt">salt</string>
     <string name="memory_cost">memory_cost</string>
     <string name="iteration">iteration</string>
+    <string name="mode">mode</string>
 
     <!--boolean -->
     <bool name="True">true</bool>
