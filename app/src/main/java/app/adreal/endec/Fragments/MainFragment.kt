@@ -32,6 +32,10 @@ class MainFragment : Fragment() {
 
         mainViewModel.generateArgonBasedAesKey()
 
+        mainViewModel.onKeyChange.observe(viewLifecycleOwner){
+            binding.key.text = it
+        }
+
         binding.settings.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
         }
