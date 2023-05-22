@@ -1,64 +1,46 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="@string/messages_header">
-
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
-            app:useSimpleSummaryProvider="true" />
+    <PreferenceCategory app:title="@string/pbe_algorithm">
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
+            app:key="algorithm"
+            app:title="@string/algorithm_title"
+            app:entries="@array/pbe_algorithms_list"
+            app:entryValues="@array/pbe_algorithms_list_values"
+            app:defaultValue="0"
+            app:enabled="false"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
-
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
-
-    </PreferenceCategory>
-    <PreferenceCategory app:title="@string/messages_header">
+    <PreferenceCategory app:title="@string/parameters_header">
 
         <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
+            app:key="password"
+            app:defaultValue="@string/default_password"
+            app:title="@string/password_title"
             app:useSimpleSummaryProvider="true" />
 
-        <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
+        <EditTextPreference
+            app:key="salt"
+            app:defaultValue="@string/default_salt"
+            app:title="@string/salt_title"
             app:useSimpleSummaryProvider="true" />
 
-    </PreferenceCategory>
-    <PreferenceCategory app:title="@string/sync_header">
+        <SeekBarPreference
+            app:key="memory_iteration"
+            app:defaultValue="10"
+            app:showSeekBarValue="true"
+            android:max="65000"
+            app:title="@string/memory_requirement" />
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+        <SeekBarPreference
+            app:key="iteration_count"
+            app:defaultValue="10"
+            app:showSeekBarValue="true"
+            android:max="65000"
+            app:title="@string/iteration_count" />
 
     </PreferenceCategory>
 

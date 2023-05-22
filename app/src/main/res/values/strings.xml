@@ -3,19 +3,35 @@
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <string name="pbe_algorithm">Algorithm</string>
+    <string name="parameters_header">Parameters</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <string name="algorithm_title">KDF Algorithm</string>
+    <string name="password_title">Password</string>
+    <string name="salt_title">Salt</string>
 
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    <string name="memory_requirement">Memory Requirement(in KiB)</string>
+    <string name="iteration_count">Iteration Count
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="pbe_algorithms_list">
+        <item>Argon2</item>
+        <item>PBKDF2</item>
+        <item>PBKDF1</item>
+    </string-array>
+
+    <string-array name="pbe_algorithms_list_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="default_salt">0123456789abcdef</string>
+    <string name="default_password">password</string>
 </resources>
