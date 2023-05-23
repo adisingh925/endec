@@ -46,11 +46,6 @@ class Encryption(private val context: Context) {
         return cipher.doFinal(data)
     }
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    fun getSecretKey() : SecretKey{
-//        return SecretKeySpec(SharedPreferences.read(Constants.AES_KEY,generateKeyFromArgon().encoded.decodeToString()).toString().encodeToByteArray(), ENCRYPTION_ALGORITHM)
-//    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     fun getIV() : IvParameterSpec{
         return IvParameterSpec(SharedPreferences.read(context.resources.getString(R.string.iv),context.getString(R.string.default_iv)).toString().encodeToByteArray())
