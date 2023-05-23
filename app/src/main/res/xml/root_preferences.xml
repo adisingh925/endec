@@ -22,7 +22,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/parameters_header">
+    <PreferenceCategory app:title="@string/kdf_parameters_header">
 
         <EditTextPreference
             app:key="@string/password"
@@ -51,6 +51,16 @@
             android:max="@integer/maximum_iteration"
             app:min="@integer/default_iteration"
             app:title="@string/iteration_count_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/aes_parameters_header">
+
+        <EditTextPreference
+            app:key="@string/iv"
+            app:defaultValue="@string/default_iv"
+            app:title="@string/iv_title"
+            app:useSimpleSummaryProvider="@bool/True" />
 
     </PreferenceCategory>
 

@@ -1,13 +1,15 @@
 <resources>
     <string name="app_name">endec</string>
     <string name="pbe_algorithm_header">Algorithm</string>
-    <string name="parameters_header">Parameters</string>
+    <string name="kdf_parameters_header">KDF Parameters</string>
     <string name="kdf_algorithm_title">KDF Algorithm</string>
     <string name="password_title">Password</string>
     <string name="salt_title">Salt</string>
     <string name="memory_requirement_title">Memory Requirement(in KiB)</string>
     <string name="iteration_count_title">Iteration Count</string>
     <string name="mode_title">Mode</string>
+    <string name="aes_parameters_header">AES Parameters</string>
+    <string name="iv_title">Initialization Vector</string>
 
     <string-array name="pbe_algorithms_list">
         <item>Argon2</item>
@@ -42,6 +44,7 @@
     <string name="default_argon_mode">0</string>
     <integer name="maximum_memory_cost">65000</integer>
     <integer name="maximum_iteration">100</integer>
+    <string name="default_iv">0123456789abcdef</string>
 
     <!-- keys -->
     <string name="algorithm">algorithm</string>
@@ -50,6 +53,7 @@
     <string name="memory_cost">memory_cost</string>
     <string name="iteration">iteration</string>
     <string name="mode">mode</string>
+    <string name="iv">iv</string>
 
     <!--boolean -->
     <bool name="True">true</bool>

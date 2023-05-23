@@ -25,7 +25,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun generateArgonBasedAesKey() {
         viewModelScope.launch(Dispatchers.IO) {
             storeArgonAESKey(
-                Base64.getEncoder().encodeToString(Encryption(getApplication<Application>().applicationContext).generateKeyFromArgon().encoded)
+                Encryption(getApplication<Application>().applicationContext).generateKeyFromArgon().encoded.decodeToString()
             )
         }
     }
@@ -33,5 +33,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun storeArgonAESKey(aesKey: String) {
         SharedPreferences.write(AES_KEY, aesKey)
         onKeyChange.postValue(aesKey)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun encryptData(data : ByteArray) : ByteArray{
+        return Encryption(getApplication<Application>().applicationContext).encryptUsingSymmetricKey(data)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun decrypt(data : ByteArray) : ByteArray{
+        return Encryption(getApplication<Application>().applicationContext).decryptUsingSymmetricKey(data)
     }
 }
