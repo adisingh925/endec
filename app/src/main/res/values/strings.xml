@@ -1,3 +1,7 @@
+<!DOCTYPE resources [
+    <!ENTITY bytes "Bytes">
+    ]>
+
 <resources>
     <string name="app_name">endec</string>
     <string name="pbe_algorithm_header">Algorithm</string>
@@ -6,10 +10,20 @@
     <string name="password_title">Password</string>
     <string name="salt_title">Salt</string>
     <string name="memory_requirement_title">Memory Requirement(in KiB)</string>
+    <string name="memory_requirement_summary">Set the memory used in hashing</string>
     <string name="iteration_count_title">Iteration Count</string>
+    <string name="iteration_count_summary">Set the desired number of iterations</string>
     <string name="mode_title">Mode</string>
     <string name="aes_parameters_header">AES Parameters</string>
     <string name="iv_title">Initialization Vector</string>
+    <string name="contact_developer_title">Contact Developer</string>
+    <string name="contact_developer_summary">Send an e-mail to the developer</string>
+    <string name="help_header">Help</string>
+    <string name="hash_length_title">Hash Length</string>
+    <string name="hash_length_summary">Set desired hash length in bytes</string>
+    <string name="version_title">Version</string>
+    <string name="parallelism_title">Parallelism</string>
+    <string name="parallelism_summary">Number of threads used for hashing</string>
 
     <string-array name="pbe_algorithms_list">
         <item>Argon2</item>
@@ -35,16 +49,32 @@
         <item>2</item>
     </string-array>
 
+    <string-array name="argon_version">
+        <item>V10</item>
+        <item>V13</item>
+    </string-array>
+
+    <string-array name="argon_version_value">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
     <!-- Important -->
-    <integer name="default_memory_cost">10000</integer>
+    <integer name="default_memory_cost">65536</integer>
     <integer name="default_iteration">10</integer>
     <string name="default_password">password</string>
     <string name="default_salt">0123456789abcdef</string>
     <integer name="default_algorithm">0</integer>
     <string name="default_argon_mode">0</string>
-    <integer name="maximum_memory_cost">65000</integer>
+    <integer name="maximum_memory_cost">131072</integer>
     <integer name="maximum_iteration">100</integer>
     <string name="default_iv">0123456789abcdef</string>
+    <string name="default_hash_length">32</string>
+    <string name="default_argon_version">1</string>
+    <integer name="max_hash_length">1024</integer>
+    <integer name="min_hash_length">32</integer>
+    <integer name="default_parallelism_value">2</integer>
+    <integer name="max_parallelism_value">8</integer>
 
     <!-- keys -->
     <string name="algorithm">algorithm</string>
@@ -54,6 +84,10 @@
     <string name="iteration">iteration</string>
     <string name="mode">mode</string>
     <string name="iv">iv</string>
+    <string name="version">version</string>
+    <string name="hash">hash</string>
+    <string name="parallelism">parallelism</string>
+
 
     <!--boolean -->
     <bool name="True">true</bool>

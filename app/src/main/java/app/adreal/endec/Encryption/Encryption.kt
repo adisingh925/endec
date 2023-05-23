@@ -10,6 +10,7 @@ import app.adreal.endec.SharedPreferences.SharedPreferences
 import com.lambdapioneer.argon2kt.Argon2Kt
 import com.lambdapioneer.argon2kt.Argon2KtResult
 import com.lambdapioneer.argon2kt.Argon2Mode
+import com.lambdapioneer.argon2kt.Argon2Version
 import java.security.SecureRandom
 import java.util.Base64
 import javax.crypto.Cipher
@@ -34,21 +35,21 @@ class Encryption(private val context: Context) {
     @RequiresApi(Build.VERSION_CODES.O)
     fun encryptUsingSymmetricKey(data: ByteArray): ByteArray {
         val cipher = Cipher.getInstance(TRANSFORMATION_AES)
-        cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(), getIV())
+        cipher.init(Cipher.ENCRYPT_MODE, generateKeyFromArgon(), getIV())
         return cipher.doFinal(data)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun decryptUsingSymmetricKey(data : ByteArray) : ByteArray {
         val cipher = Cipher.getInstance(TRANSFORMATION_AES)
-        cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), getIV())
+        cipher.init(Cipher.DECRYPT_MODE, generateKeyFromArgon(), getIV())
         return cipher.doFinal(data)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun getSecretKey() : SecretKey{
-        return SecretKeySpec(SharedPreferences.read(Constants.AES_KEY,generateKeyFromArgon().encoded.decodeToString()).toString().encodeToByteArray(), ENCRYPTION_ALGORITHM)
-    }
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun getSecretKey() : SecretKey{
+//        return SecretKeySpec(SharedPreferences.read(Constants.AES_KEY,generateKeyFromArgon().encoded.decodeToString()).toString().encodeToByteArray(), ENCRYPTION_ALGORITHM)
+//    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getIV() : IvParameterSpec{
@@ -61,13 +62,19 @@ class Encryption(private val context: Context) {
         saltByteArray: ByteArray,
         memoryCost: Int,
         iteration: Int,
+        version : Argon2Version,
+        hashLength : Int,
+        parallelism : Int
     ): Argon2KtResult {
         return argon2.hash(
             mode = argonMode,
             password = passwordByteArray,
             salt = saltByteArray,
             tCostInIterations = iteration,
-            mCostInKibibyte = memoryCost
+            mCostInKibibyte = memoryCost,
+            version = version,
+            hashLengthInBytes = hashLength,
+            parallelism = parallelism
         )
     }
 
@@ -76,14 +83,17 @@ class Encryption(private val context: Context) {
         return SecretKeySpec(keyBytes, ENCRYPTION_ALGORITHM)
     }
 
-    fun generateKeyFromArgon(): SecretKey {
+    private fun generateKeyFromArgon(): SecretKey {
         return generateAESKeyFromHash(
             generateArgon2Hash(
                 getArgonMode(),
                 getPassword(),
                 getSalt(),
                 getMemoryCost(),
-                getIteration()
+                getIteration(),
+                getArgonVersion(),
+                getHashLength(),
+                getParallelismValue()
             ).rawHashAsHexadecimal(true)
         )
     }
@@ -126,5 +136,30 @@ class Encryption(private val context: Context) {
             2 -> Argon2Mode.ARGON2_ID
             else -> Argon2Mode.ARGON2_D
         }
+    }
+
+    private fun getArgonVersion() : Argon2Version{
+        return when (SharedPreferences.read(
+            context.resources.getString(R.string.version),
+            context.resources.getString(R.string.default_argon_version)
+        ).toString().toInt()) {
+            0 -> Argon2Version.V10
+            1 -> Argon2Version.V13
+            else -> Argon2Version.V13
+        }
+    }
+
+    private fun getHashLength() : Int{
+        return SharedPreferences.read(
+            context.resources.getString(R.string.hash),
+            context.resources.getInteger(R.integer.min_hash_length)
+        ).toString().toInt()
+    }
+
+    private fun getParallelismValue() : Int{
+        return SharedPreferences.read(
+            context.resources.getString(R.string.parallelism),
+            context.resources.getInteger(R.integer.default_parallelism_value)
+        ).toString().toInt()
     }
 }

@@ -20,6 +20,14 @@
             app:defaultValue="@string/default_argon_mode"
             app:useSimpleSummaryProvider="@bool/True" />
 
+        <ListPreference
+            app:key="@string/version"
+            app:entries="@array/argon_version"
+            app:defaultValue="@string/default_argon_version"
+            app:entryValues="@array/argon_version_value"
+            app:useSimpleSummaryProvider="@bool/True"
+            app:title="@string/version_title"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/kdf_parameters_header">
@@ -41,6 +49,7 @@
             app:showSeekBarValue="@bool/True"
             android:max="@integer/maximum_memory_cost"
             app:min="@integer/default_memory_cost"
+            android:summary="@string/memory_requirement_summary"
             app:defaultValue="@integer/default_memory_cost"
             app:title="@string/memory_requirement_title" />
 
@@ -48,9 +57,28 @@
             app:key="@string/iteration"
             app:defaultValue="@integer/default_iteration"
             app:showSeekBarValue="@bool/True"
+            android:summary="@string/iteration_count_summary"
             android:max="@integer/maximum_iteration"
             app:min="@integer/default_iteration"
             app:title="@string/iteration_count_title" />
+
+        <SeekBarPreference
+            app:key="@string/hash"
+            app:title="@string/hash_length_title"
+            app:showSeekBarValue="@bool/True"
+            app:defaultValue="@string/default_hash_length"
+            android:max="@integer/max_hash_length"
+            app:min="@integer/min_hash_length"
+            app:summary="@string/hash_length_summary"/>
+
+        <SeekBarPreference
+            app:key="@string/parallelism"
+            app:title="@string/parallelism_title"
+            android:summary="@string/parallelism_summary"
+            app:defaultValue="@integer/default_parallelism_value"
+            app:min="@integer/default_parallelism_value"
+            android:max="@integer/max_parallelism_value"
+            app:showSeekBarValue="@bool/True"/>
 
     </PreferenceCategory>
 
@@ -60,6 +88,15 @@
             app:key="@string/iv"
             app:defaultValue="@string/default_iv"
             app:title="@string/iv_title"
+            app:useSimpleSummaryProvider="@bool/True" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/help_header">
+
+        <Preference
+            app:title="@string/contact_developer_title"
+            android:summary="@string/contact_developer_summary"
             app:useSimpleSummaryProvider="@bool/True" />
 
     </PreferenceCategory>

@@ -15,25 +15,25 @@ import java.util.Base64
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    companion object {
-        const val AES_KEY = "aesKey"
-    }
-
-    val onKeyChange = MutableLiveData<String>()
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun generateArgonBasedAesKey() {
-        viewModelScope.launch(Dispatchers.IO) {
-            storeArgonAESKey(
-                Encryption(getApplication<Application>().applicationContext).generateKeyFromArgon().encoded.decodeToString()
-            )
-        }
-    }
-
-    private fun storeArgonAESKey(aesKey: String) {
-        SharedPreferences.write(AES_KEY, aesKey)
-        onKeyChange.postValue(aesKey)
-    }
+//    companion object {
+//        const val AES_KEY = "aesKey"
+//    }
+//
+//    val onKeyChange = MutableLiveData<String>()
+//
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun generateArgonBasedAesKey() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            storeArgonAESKey(
+//                Encryption(getApplication<Application>().applicationContext).generateKeyFromArgon().encoded.decodeToString()
+//            )
+//        }
+//    }
+//
+//    private fun storeArgonAESKey(aesKey: String) {
+//        SharedPreferences.write(AES_KEY, aesKey)
+//        onKeyChange.postValue(aesKey)
+//    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun encryptData(data : ByteArray) : ByteArray{

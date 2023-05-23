@@ -6,9 +6,6 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
-import android.provider.MediaStore.Files
-import android.provider.MediaStore.getMediaUri
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,7 +21,6 @@ import app.adreal.endec.databinding.FragmentMainBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
 
 class MainFragment : Fragment() {
@@ -51,10 +47,15 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        mainViewModel.generateArgonBasedAesKey()
+//        mainViewModel.generateArgonBasedAesKey()
+//
+//        mainViewModel.onKeyChange.observe(viewLifecycleOwner) {
+//            binding.key.text = it
+//        }
 
-        mainViewModel.onKeyChange.observe(viewLifecycleOwner) {
-            binding.key.text = it
+        CoroutineScope(Dispatchers.IO).launch {
+            val decryptedData = mainViewModel.decrypt(mainViewModel.encryptData("hello".encodeToByteArray()))
+            Log.d("decrypted Data",decryptedData.decodeToString())
         }
 
         binding.settings.setOnClickListener {
@@ -69,21 +70,20 @@ class MainFragment : Fragment() {
     }
 
     private fun openExplorer() {
-        val pickFile = Intent(
-            Intent.ACTION_PICK
-        )
-        pickFile.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "*/*")
-        pickFile.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        pickFile.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        startActivityForResult(pickFile, PICKFILE_REQUEST_CODE)
+        val intent = Intent()
+            .setType("*/*")
+            .setAction(Intent.ACTION_GET_CONTENT)
+
+        startActivityForResult(intent, PICKFILE_REQUEST_CODE)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && requestCode == PICKFILE_REQUEST_CODE) {
             data?.data?.also { uri ->
                 Log.d("MIME Type", contentResolver?.getType(uri).toString())
-                readFile(uri)
                 dumpImageMetaData(uri)
+                readFile(uri)
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -107,7 +107,11 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun readFile(uri : Uri){
-        val file = File(uri.path.toString())
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun readFile(uri : Uri) : ByteArray? {
+        val inputStream = contentResolver?.openInputStream(uri)
+        val data = inputStream?.readBytes()
+        inputStream?.close()
+        return data
     }
 }
