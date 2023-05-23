@@ -1,11 +1,14 @@
 package app.adreal.endec.Fragments
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,6 +24,8 @@ import app.adreal.endec.databinding.FragmentMainBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileDescriptor
 
 
 class MainFragment : Fragment() {
@@ -47,11 +52,7 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-//        mainViewModel.generateArgonBasedAesKey()
-//
-//        mainViewModel.onKeyChange.observe(viewLifecycleOwner) {
-//            binding.key.text = it
-//        }
+        createFolder()
 
         CoroutineScope(Dispatchers.IO).launch {
             val decryptedData = mainViewModel.decrypt(mainViewModel.encryptData("hello".encodeToByteArray()))
@@ -67,6 +68,14 @@ class MainFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun createFolder() {
+        val folder = Environment.getExternalStoragePublicDirectory("/android/media")
+        val f = File(folder, "endec")
+        if(!f.exists()){
+            f.mkdir()
+        }
     }
 
     private fun openExplorer() {
