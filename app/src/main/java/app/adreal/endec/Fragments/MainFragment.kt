@@ -1,15 +1,10 @@
 package app.adreal.endec.Fragments
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.DocumentsContract
-import android.provider.OpenableColumns
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,8 +19,6 @@ import app.adreal.endec.databinding.FragmentMainBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileDescriptor
 
 
 class MainFragment : Fragment() {
@@ -52,11 +45,11 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        createFolder()
+        app.adreal.endec.File.File().createOrGetFile(requireContext(),"test.txt", "hello".encodeToByteArray())
 
         CoroutineScope(Dispatchers.IO).launch {
             val decryptedData = mainViewModel.decrypt(mainViewModel.encryptData("hello".encodeToByteArray()))
-            Log.d("decrypted Data",decryptedData.decodeToString())
+            Log.d("decrypted Data", decryptedData.decodeToString())
         }
 
         binding.settings.setOnClickListener {
@@ -68,14 +61,6 @@ class MainFragment : Fragment() {
         }
 
         return binding.root
-    }
-
-    private fun createFolder() {
-        val folder = Environment.getExternalStoragePublicDirectory("/android/media")
-        val f = File(folder, "endec")
-        if(!f.exists()){
-            f.mkdir()
-        }
     }
 
     private fun openExplorer() {
@@ -90,34 +75,16 @@ class MainFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && requestCode == PICKFILE_REQUEST_CODE) {
             data?.data?.also { uri ->
-                Log.d("MIME Type", contentResolver?.getType(uri).toString())
-                dumpImageMetaData(uri)
+                contentResolver?.let { app.adreal.endec.File.File().getMIMEType(uri, it) }
+                contentResolver?.let { app.adreal.endec.File.File().dumpImageMetaData(uri, it) }
                 readFile(uri)
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun dumpImageMetaData(uri: Uri) {
-        val cursor: Cursor? = contentResolver?.query(uri, null, null, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val displayName: String =
-                    it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                Log.d("File Data", "Display Name: $displayName")
-                val sizeIndex: Int = it.getColumnIndex(OpenableColumns.SIZE)
-                val size: String = if (!it.isNull(sizeIndex)) {
-                    it.getString(sizeIndex)
-                } else {
-                    "Unknown"
-                }
-                Log.d("File data", "Size: $size")
-            }
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun readFile(uri : Uri) : ByteArray? {
+    private fun readFile(uri: Uri): ByteArray? {
         val inputStream = contentResolver?.openInputStream(uri)
         val data = inputStream?.readBytes()
         inputStream?.close()
