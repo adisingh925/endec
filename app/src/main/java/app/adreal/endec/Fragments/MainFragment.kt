@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,15 +12,15 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import app.adreal.endec.File.File
 import app.adreal.endec.R
+import app.adreal.endec.RecyclerView.MainAdapter
 import app.adreal.endec.ViewModel.MainViewModel
 import app.adreal.endec.databinding.FragmentMainBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
-class MainFragment : Fragment() {
+class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     companion object {
         const val PICKFILE_REQUEST_CODE = 10
@@ -39,17 +38,24 @@ class MainFragment : Fragment() {
         context?.contentResolver
     }
 
+    private val adapter by lazy{
+        MainAdapter(requireContext(),this)
+    }
+
+    private val recyclerView by lazy{
+        binding.recyclerView
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
-        app.adreal.endec.File.File().createOrGetFile(requireContext(),"test.txt", "hello".encodeToByteArray())
+        initRecyclerView()
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val decryptedData = mainViewModel.decrypt(mainViewModel.encryptData("hello".encodeToByteArray()))
-            Log.d("decrypted Data", decryptedData.decodeToString())
+        mainViewModel.filesData.observe(viewLifecycleOwner){
+            adapter.setData(it)
         }
 
         binding.settings.setOnClickListener {
@@ -61,6 +67,11 @@ class MainFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun initRecyclerView(){
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(context)
     }
 
     private fun openExplorer() {
@@ -75,9 +86,10 @@ class MainFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && requestCode == PICKFILE_REQUEST_CODE) {
             data?.data?.also { uri ->
-                contentResolver?.let { app.adreal.endec.File.File().getMIMEType(uri, it) }
-                contentResolver?.let { app.adreal.endec.File.File().dumpImageMetaData(uri, it) }
-                readFile(uri)
+                val fileData = readFile(uri)
+                if(fileData != null){
+                    File().createOrGetFile(requireContext(),System.currentTimeMillis().toString(),fileData)
+                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -89,5 +101,9 @@ class MainFragment : Fragment() {
         val data = inputStream?.readBytes()
         inputStream?.close()
         return data
+    }
+
+    override fun onItemClick() {
+
     }
 }

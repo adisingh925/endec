@@ -30,8 +30,7 @@ class File {
         val cursor: Cursor? = contentResolver.query(uri, null, null, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
-                val displayName: String =
-                    it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                val displayName: String = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
                 Log.d(FILE_DATA, "$DISPLAY_NAME $displayName")
                 val sizeIndex: Int = it.getColumnIndex(OpenableColumns.SIZE)
                 val size: String = if (!it.isNull(sizeIndex)) {
@@ -61,5 +60,14 @@ class File {
                 }
             }
         }
+    }
+
+    fun monitorFileList(context: Context) : List<String> {
+        val filesList = mutableListOf<String>()
+        for(i in context.getExternalFilesDir(null)?.list()!!){
+            filesList.add(i)
+        }
+
+        return filesList.toList()
     }
 }
