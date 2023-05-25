@@ -6,10 +6,13 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import app.adreal.endec.Database.Database
 import app.adreal.endec.Encryption.Encryption
 import app.adreal.endec.Model.File
 import app.adreal.endec.Repository.Repository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -37,7 +40,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    fun monitorFile(context: Context) {
-        app.adreal.endec.File.File().monitorFileList(context)
+    fun add(item: File)
+    {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addUser(item)
+        }
     }
 }

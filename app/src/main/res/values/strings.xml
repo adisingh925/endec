@@ -87,6 +87,7 @@
     <string name="version">version</string>
     <string name="hash">hash</string>
     <string name="parallelism">parallelism</string>
+    <string name="encrypted_files">Encrypted Files</string>
 
 
     <!--boolean -->

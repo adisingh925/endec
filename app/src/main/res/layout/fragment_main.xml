@@ -6,19 +6,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.MainFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/recycler_view"/>
-
     <TextView
-        android:id="@+id/key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/medium_margin"
+        android:id="@+id/heading"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:textSize="10sp"/>
+        android:textSize="@dimen/heading_size"
+        android:textStyle="bold"
+        android:layout_marginTop="@dimen/medium_margin"
+        android:layout_marginStart="@dimen/medium_margin"
+        android:text="@string/encrypted_files"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/medium_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/heading"
+        android:id="@+id/recycler_view"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/encrypt"

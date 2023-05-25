@@ -6,24 +6,27 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import app.adreal.endec.Model.File
 import app.adreal.endec.databinding.RecycleritemBinding
+import com.bumptech.glide.Glide
 
-class MainAdapter(private val context: Context, private val onItemClickListener : OnItemClickListener) : RecyclerView.Adapter<MainAdapter.MyViewHolder>() {
+class MainAdapter(
+    private val context: Context,
+    private val onItemClickListener: OnItemClickListener
+) : RecyclerView.Adapter<MainAdapter.MyViewHolder>() {
 
-    lateinit var binding: RecycleritemBinding
+    private lateinit var binding: RecycleritemBinding
 
     private var filesList = emptyList<File>()
 
-    interface OnItemClickListener
-    {
+    interface OnItemClickListener {
         fun onItemClick()
     }
 
     class MyViewHolder(binding: RecycleritemBinding) : RecyclerView.ViewHolder(binding.root) {
-        val fileName = binding.recyclerItemText
+        val image = binding.recyclerItemImage
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        binding = RecycleritemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        binding = RecycleritemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(binding)
     }
 
@@ -32,17 +35,15 @@ class MainAdapter(private val context: Context, private val onItemClickListener 
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.fileName.text = filesList[position].fileName
+        Glide.with(context).load(java.io.File(context.getExternalFilesDir("")?.path, filesList[position].fileName)).centerCrop().into(holder.image)
 
-        holder.itemView.setOnClickListener{
+        holder.itemView.setOnClickListener {
             onItemClickListener.onItemClick()
         }
     }
 
-    fun setData(data: List<File>)
-    {
+    fun setData(data: List<File>) {
         this.filesList = data
-        notifyItemRangeInserted(0,data.size - 1)
+        notifyDataSetChanged()
     }
-
 }

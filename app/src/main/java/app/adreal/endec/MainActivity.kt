@@ -12,9 +12,5 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         SharedPreferences.init(this)
-
-        val directoryFileObserver = FileObserver(this.getExternalFilesDir(null)!!.path)
-
-        directoryFileObserver.startWatching()
     }
 }

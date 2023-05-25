@@ -12,13 +12,12 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import app.adreal.endec.File.File
 import app.adreal.endec.R
 import app.adreal.endec.RecyclerView.MainAdapter
 import app.adreal.endec.ViewModel.MainViewModel
 import app.adreal.endec.databinding.FragmentMainBinding
-
 
 class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
@@ -71,12 +70,12 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     private fun initRecyclerView(){
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = GridLayoutManager(context,3)
     }
 
     private fun openExplorer() {
         val intent = Intent()
-            .setType("*/*")
+            .setType("image/*")
             .setAction(Intent.ACTION_GET_CONTENT)
 
         startActivityForResult(intent, PICKFILE_REQUEST_CODE)
@@ -88,7 +87,9 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
             data?.data?.also { uri ->
                 val fileData = readFile(uri)
                 if(fileData != null){
-                    File().createOrGetFile(requireContext(),System.currentTimeMillis().toString(),fileData)
+                    val fileName = File().dumpImageMetaData(uri,contentResolver!!).name
+                    mainViewModel.add(app.adreal.endec.Model.File(0,fileName))
+                    File().createOrGetFile(requireContext(),fileName,fileData)
                 }
             }
         }

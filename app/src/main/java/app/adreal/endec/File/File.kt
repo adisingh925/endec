@@ -3,15 +3,21 @@ package app.adreal.endec.File
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
+import app.adreal.endec.Model.metaData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+
 
 class File {
 
@@ -26,7 +32,8 @@ class File {
         Log.d(MIME_TYPE, contentResolver.getType(uri).toString())
     }
 
-    fun dumpImageMetaData(uri: Uri, contentResolver: ContentResolver) {
+    fun dumpImageMetaData(uri: Uri, contentResolver: ContentResolver) : metaData {
+        val fileData = metaData("",0)
         val cursor: Cursor? = contentResolver.query(uri, null, null, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
@@ -39,14 +46,17 @@ class File {
                     "Unknown"
                 }
                 Log.d(FILE_DATA, "$SIZE $size")
+                fileData.name = displayName
+                fileData.size = size.toLong()
             }
         }
+
+        return fileData
     }
 
     fun createOrGetFile(context: Context, fileName: String, data: ByteArray) {
         CoroutineScope(Dispatchers.IO).launch {
-            val folder = context.getExternalFilesDir(null)
-            val f = File(folder?.path, fileName)
+            val f = File(context.getExternalFilesDir("")?.path, fileName)
 
             if (!f.exists()) {
                 withContext(Dispatchers.IO) {
@@ -60,14 +70,5 @@ class File {
                 }
             }
         }
-    }
-
-    fun monitorFileList(context: Context) : List<String> {
-        val filesList = mutableListOf<String>()
-        for(i in context.getExternalFilesDir(null)?.list()!!){
-            filesList.add(i)
-        }
-
-        return filesList.toList()
     }
 }

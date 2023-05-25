@@ -2,4 +2,5 @@
 <resources>
     <string name="parallelism">parallelism</string>
     <string name="parallelism_title">Parallelism</string>
+    <string name="encrypted_files">Encrypted Files</string>
 </resources>
