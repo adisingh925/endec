@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import app.adreal.endec.Constants
+import app.adreal.endec.Encryption.Encryption
 import app.adreal.endec.File.File
 import app.adreal.endec.R
 import app.adreal.endec.RecyclerView.MainAdapter
@@ -96,13 +97,16 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+    @RequiresApi(VERSION_CODES.O)
     override fun onItemClick(fileName : String) {
+        val path = File().createTempFile(requireContext(), fileName)
+
         val intent = Intent(Intent.ACTION_VIEW)
             .setDataAndType(
                 FileProvider.getUriForFile(
                     requireContext(),
                     (context?.packageName) + ".provider",
-                    java.io.File(Constants.getFilesDirectoryPath(requireContext()),fileName)
+                    java.io.File(path)
                 ),
                 Constants.PICKER_ID
             ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

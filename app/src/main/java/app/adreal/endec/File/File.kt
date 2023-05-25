@@ -10,12 +10,14 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import app.adreal.endec.Constants
 import app.adreal.endec.Database.Database
+import app.adreal.endec.Encryption.Encryption
 import app.adreal.endec.Model.metaData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 
 
@@ -69,10 +71,9 @@ class File {
             }
         }.invokeOnCompletion {
             CoroutineScope(Dispatchers.IO).launch {
-                withContext(Dispatchers.IO) {
-                    FileOutputStream(f).use {
-                        it.write(inputStream?.readBytes())
-                    }
+                val fos = FileOutputStream(f)
+                if (inputStream != null) {
+                    Encryption(context).encryptUsingSymmetricKey(fos, inputStream.readBytes())
                 }
             }.invokeOnCompletion {
                 inputStream?.close()
@@ -85,5 +86,17 @@ class File {
                 )
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun createTempFile(context: Context, fileName : String) : String{
+        val outputDir: File = context.cacheDir // context being the Activity pointer
+        val outputFile: File = File.createTempFile("prefix", ".jpg", outputDir)
+        val fos_temp = FileInputStream(File(Constants.getFilesDirectoryPath(context), fileName))
+        val fos = FileOutputStream(outputFile).use {
+            it.write(Encryption(context).decryptUsingSymmetricKey(fos_temp))
+        }
+
+        return outputFile.path
     }
 }

@@ -26,19 +26,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         filesData = repository.readAll
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun encryptData(data: ByteArray): ByteArray {
-        return Encryption(getApplication<Application>().applicationContext).encryptUsingSymmetricKey(
-            data
-        )
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun decrypt(data: ByteArray): ByteArray {
-        return Encryption(getApplication<Application>().applicationContext).decryptUsingSymmetricKey(
-            data
-        )
-    }
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun encryptData(data: ByteArray): ByteArray {
+//        return Encryption(getApplication<Application>().applicationContext).encryptUsingSymmetricKey(
+//            data
+//        )
+//    }
+//
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun decrypt(data: ByteArray): ByteArray {
+//        return Encryption(getApplication<Application>().applicationContext).decryptUsingSymmetricKey(
+//            data
+//        )
+//    }
 
     fun add(item: File)
     {

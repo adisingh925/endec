@@ -11,10 +11,13 @@ import com.lambdapioneer.argon2kt.Argon2Kt
 import com.lambdapioneer.argon2kt.Argon2KtResult
 import com.lambdapioneer.argon2kt.Argon2Mode
 import com.lambdapioneer.argon2kt.Argon2Version
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.security.SecureRandom
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
+import javax.crypto.CipherOutputStream
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -34,17 +37,19 @@ class Encryption(private val context: Context) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun encryptUsingSymmetricKey(data: ByteArray): ByteArray {
+    fun encryptUsingSymmetricKey(fos : FileOutputStream, data : ByteArray) {
         val cipher = Cipher.getInstance(TRANSFORMATION_AES)
         cipher.init(Cipher.ENCRYPT_MODE, generateKeyFromArgon(), getIV())
-        return cipher.doFinal(data)
+        CipherOutputStream(fos,cipher).use {
+            it.write(data)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun decryptUsingSymmetricKey(data : ByteArray) : ByteArray {
+    fun decryptUsingSymmetricKey(fis : FileInputStream) : ByteArray {
         val cipher = Cipher.getInstance(TRANSFORMATION_AES)
         cipher.init(Cipher.DECRYPT_MODE, generateKeyFromArgon(), getIV())
-        return cipher.doFinal(data)
+        return CipherInputStream(fis,cipher).readBytes()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
