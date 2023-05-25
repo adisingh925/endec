@@ -90,11 +90,10 @@ class File {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createTempFile(context: Context, fileName : String) : String{
-        val outputDir: File = context.cacheDir // context being the Activity pointer
-        val outputFile: File = File.createTempFile("prefix", ".jpg", outputDir)
-        val fos_temp = FileInputStream(File(Constants.getFilesDirectoryPath(context), fileName))
-        val fos = FileOutputStream(outputFile).use {
-            it.write(Encryption(context).decryptUsingSymmetricKey(fos_temp))
+        val outputFile = File.createTempFile(fileName + "_decrypted", ".jpg", context.cacheDir)
+        val fos = FileInputStream(File(Constants.getFilesDirectoryPath(context), fileName))
+        FileOutputStream(outputFile).use {
+            it.write(Encryption(context).decryptUsingSymmetricKey(fos))
         }
 
         return outputFile.path

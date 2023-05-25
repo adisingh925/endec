@@ -99,14 +99,12 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     @RequiresApi(VERSION_CODES.O)
     override fun onItemClick(fileName : String) {
-        val path = File().createTempFile(requireContext(), fileName)
-
         val intent = Intent(Intent.ACTION_VIEW)
             .setDataAndType(
                 FileProvider.getUriForFile(
                     requireContext(),
                     (context?.packageName) + ".provider",
-                    java.io.File(path)
+                    java.io.File(File().createTempFile(requireContext(), fileName))
                 ),
                 Constants.PICKER_ID
             ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
