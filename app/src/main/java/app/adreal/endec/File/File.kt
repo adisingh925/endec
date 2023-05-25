@@ -3,19 +3,19 @@ package app.adreal.endec.File
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.provider.OpenableColumns
 import android.util.Log
+import androidx.annotation.RequiresApi
+import app.adreal.endec.Constants
+import app.adreal.endec.Database.Database
 import app.adreal.endec.Model.metaData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 
 
@@ -32,12 +32,13 @@ class File {
         Log.d(MIME_TYPE, contentResolver.getType(uri).toString())
     }
 
-    fun dumpImageMetaData(uri: Uri, contentResolver: ContentResolver) : metaData {
-        val fileData = metaData("",0)
+    private fun dumpImageMetaData(uri: Uri, contentResolver: ContentResolver): metaData {
+        val fileData = metaData("", 0)
         val cursor: Cursor? = contentResolver.query(uri, null, null, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
-                val displayName: String = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                val displayName: String =
+                    it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
                 Log.d(FILE_DATA, "$DISPLAY_NAME $displayName")
                 val sizeIndex: Int = it.getColumnIndex(OpenableColumns.SIZE)
                 val size: String = if (!it.isNull(sizeIndex)) {
@@ -54,20 +55,34 @@ class File {
         return fileData
     }
 
-    fun createOrGetFile(context: Context, fileName: String, data: ByteArray) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val f = File(context.getExternalFilesDir("")?.path, fileName)
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun readFile(uri: Uri, contentResolver: ContentResolver, context: Context) {
+        val inputStream = contentResolver.openInputStream(uri)
+        val fileData = dumpImageMetaData(uri, contentResolver)
+        val f = File(Constants.getFilesDirectoryPath(context), fileData.name)
 
+        CoroutineScope(Dispatchers.IO).launch {
             if (!f.exists()) {
                 withContext(Dispatchers.IO) {
                     f.createNewFile()
                 }
             }
-
-            withContext(Dispatchers.IO) {
-                FileOutputStream(f).use {
-                    it.write(data)
+        }.invokeOnCompletion {
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(Dispatchers.IO) {
+                    FileOutputStream(f).use {
+                        it.write(inputStream?.readBytes())
+                    }
                 }
+            }.invokeOnCompletion {
+                inputStream?.close()
+                Database.getDatabase(context).dao().add(
+                    app.adreal.endec.Model.File(
+                        uri.lastPathSegment.toString(),
+                        fileData.name,
+                        fileData.size
+                    )
+                )
             }
         }
     }

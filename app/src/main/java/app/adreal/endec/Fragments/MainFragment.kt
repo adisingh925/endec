@@ -2,7 +2,6 @@ package app.adreal.endec.Fragments
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import app.adreal.endec.Constants
 import app.adreal.endec.File.File
 import app.adreal.endec.R
 import app.adreal.endec.RecyclerView.MainAdapter
@@ -70,12 +70,12 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     private fun initRecyclerView(){
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(context,3)
+        recyclerView.layoutManager = GridLayoutManager(context,Constants.RECYCLERVIEW_SPAN_COUNT)
     }
 
     private fun openExplorer() {
         val intent = Intent()
-            .setType("image/*")
+            .setType(Constants.PICKER_ID)
             .setAction(Intent.ACTION_GET_CONTENT)
 
         startActivityForResult(intent, PICKFILE_REQUEST_CODE)
@@ -85,23 +85,10 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && requestCode == PICKFILE_REQUEST_CODE) {
             data?.data?.also { uri ->
-                val fileData = readFile(uri)
-                if(fileData != null){
-                    val fileName = File().dumpImageMetaData(uri,contentResolver!!).name
-                    mainViewModel.add(app.adreal.endec.Model.File(0,fileName))
-                    File().createOrGetFile(requireContext(),fileName,fileData)
-                }
+                File().readFile(uri,contentResolver!!,requireContext())
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun readFile(uri: Uri): ByteArray? {
-        val inputStream = contentResolver?.openInputStream(uri)
-        val data = inputStream?.readBytes()
-        inputStream?.close()
-        return data
     }
 
     override fun onItemClick() {

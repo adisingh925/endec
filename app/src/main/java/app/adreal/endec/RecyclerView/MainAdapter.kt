@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import app.adreal.endec.Constants
 import app.adreal.endec.Model.File
 import app.adreal.endec.databinding.RecycleritemBinding
 import com.bumptech.glide.Glide
@@ -35,7 +36,7 @@ class MainAdapter(
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        Glide.with(context).load(java.io.File(context.getExternalFilesDir("")?.path, filesList[position].fileName)).centerCrop().into(holder.image)
+        Glide.with(context).load(java.io.File(Constants.getFilesDirectoryPath(context), filesList[position].fileName)).centerCrop().into(holder.image)
 
         holder.itemView.setOnClickListener {
             onItemClickListener.onItemClick()
