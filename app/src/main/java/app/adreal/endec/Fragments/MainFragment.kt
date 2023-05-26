@@ -108,8 +108,7 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
                     java.io.File(File().createTempFile(requireContext(), fileData))
                 ),
                 Constants.PICKER_ID
-            ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
+            ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION).setPackage("com.google.android.apps.photos")
         startActivity(intent)
     }
 }
