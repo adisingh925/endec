@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Build.DISPLAY
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
@@ -30,6 +31,9 @@ import app.adreal.endec.RecyclerView.MainAdapter
 import app.adreal.endec.ViewModel.MainViewModel
 import app.adreal.endec.databinding.FragmentMainBinding
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
@@ -145,16 +149,18 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     @RequiresApi(VERSION_CODES.O)
     override fun onItemClick(fileData : app.adreal.endec.Model.File) {
-        val intent = Intent(Intent.ACTION_VIEW)
-            .setDataAndType(
-                FileProvider.getUriForFile(
-                    requireContext(),
-                    (context?.packageName) + Constants.PROVIDER,
-                    java.io.File(File().createTempFile(requireContext(), fileData))
-                ),
-                Constants.PICKER_ID
-            ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        startActivity(intent)
+        CoroutineScope(Dispatchers.IO).launch {
+            val intent = Intent(Intent.ACTION_VIEW)
+                .setDataAndType(
+                    FileProvider.getUriForFile(
+                        requireContext(),
+                        (context?.packageName) + Constants.PROVIDER,
+                        java.io.File(File().createTempFile(requireContext(), fileData))
+                    ),
+                    Constants.PICKER_ID
+                ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(intent)
+        }
     }
 
     fun showPopup(v: View, context: Context) {
