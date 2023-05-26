@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.security.keystore.KeyProperties
 import androidx.annotation.RequiresApi
-import app.adreal.endec.Constants
 import app.adreal.endec.R
 import app.adreal.endec.SharedPreferences.SharedPreferences
 import com.lambdapioneer.argon2kt.Argon2Kt
@@ -13,8 +12,6 @@ import com.lambdapioneer.argon2kt.Argon2Mode
 import com.lambdapioneer.argon2kt.Argon2Version
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.security.SecureRandom
-import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
 import javax.crypto.CipherOutputStream
@@ -37,19 +34,17 @@ class Encryption(private val context: Context) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun encryptUsingSymmetricKey(fos : FileOutputStream, data : ByteArray) {
+    fun encryptUsingSymmetricKey(fos: FileOutputStream) : CipherOutputStream {
         val cipher = Cipher.getInstance(TRANSFORMATION_AES)
         cipher.init(Cipher.ENCRYPT_MODE, generateKeyFromArgon(), getIV())
-        CipherOutputStream(fos,cipher).use {
-            it.write(data)
-        }
+        return CipherOutputStream(fos,cipher)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun decryptUsingSymmetricKey(fis : FileInputStream) : ByteArray {
+    fun decryptUsingSymmetricKey(fis : FileInputStream) : CipherInputStream {
         val cipher = Cipher.getInstance(TRANSFORMATION_AES)
         cipher.init(Cipher.DECRYPT_MODE, generateKeyFromArgon(), getIV())
-        return CipherInputStream(fis,cipher).readBytes()
+        return CipherInputStream(fis,cipher)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

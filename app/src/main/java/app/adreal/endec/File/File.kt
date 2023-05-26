@@ -65,6 +65,8 @@ class File {
         val inputStream = contentResolver.openInputStream(uri)
         val fileData = dumpImageMetaData(uri, contentResolver)
         val f = File(Constants.getFilesDirectoryPath(context), fileData.name)
+        val fos = FileOutputStream(f, true)
+        val cos = Encryption(context).encryptUsingSymmetricKey(fos)
 
         CoroutineScope(Dispatchers.IO).launch {
             if (!f.exists()) {
@@ -73,17 +75,13 @@ class File {
                 }
             }
         }.invokeOnCompletion {
-            CoroutineScope(Dispatchers.IO).launch {
-                if (inputStream != null) {
-                    withContext(Dispatchers.IO) {
-                        Encryption(context).encryptUsingSymmetricKey(
-                            FileOutputStream(f),
-                            inputStream.readBytes()
-                        )
-                    }
-                }
-            }.invokeOnCompletion {
+            try{
+                inputStream?.copyTo(cos)
+            }catch (e : Exception){
+                Log.d("File Write Exception",e.message.toString())
+            }finally {
                 inputStream?.close()
+                cos.close()
                 Database.getDatabase(context).dao().add(
                     app.adreal.endec.Model.File(
                         uri.lastPathSegment.toString(),
@@ -100,11 +98,11 @@ class File {
     @RequiresApi(Build.VERSION_CODES.O)
     fun createTempFile(context: Context, fileData : app.adreal.endec.Model.File) : String{
         val outputFile = File.createTempFile(fileData.fileName + "_decrypted", ".${fileData.extension}", context.cacheDir)
-        val fos = FileInputStream(File(Constants.getFilesDirectoryPath(context), fileData.fileName))
-        FileOutputStream(outputFile).use {
-            it.write(Encryption(context).decryptUsingSymmetricKey(fos))
-        }
-
+        val fis = FileInputStream(File(Constants.getFilesDirectoryPath(context), fileData.fileName))
+        val cis = Encryption(context).decryptUsingSymmetricKey(fis)
+        cis.copyTo(FileOutputStream(outputFile))
+        cis.close()
+        fis.close()
         return outputFile.path
     }
 
