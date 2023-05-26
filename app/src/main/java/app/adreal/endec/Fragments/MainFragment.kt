@@ -31,7 +31,6 @@ import app.adreal.endec.ViewModel.MainViewModel
 import app.adreal.endec.databinding.FragmentMainBinding
 import com.google.android.material.snackbar.Snackbar
 
-
 class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     companion object {
@@ -154,7 +153,7 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
                     java.io.File(File().createTempFile(requireContext(), fileData))
                 ),
                 Constants.PICKER_ID
-            ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION).setPackage("com.google.android.apps.photos")
+            ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(intent)
     }
 

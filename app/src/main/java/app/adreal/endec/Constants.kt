@@ -7,7 +7,7 @@ object Constants {
     const val HOME_DIRECTORY = "/android/media"
     const val DATABASE_NAME = "FilesDatabase"
     const val DEFAULT_ID = 0
-    const val PICKER_ID = "image/*"
+    const val PICKER_ID = "*/*"
     const val RECYCLERVIEW_SPAN_COUNT = 3
     const val TABLE_NAME = "FileTable"
     const val PROVIDER = ".provider"
