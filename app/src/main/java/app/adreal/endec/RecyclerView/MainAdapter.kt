@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import app.adreal.endec.Constants
+import app.adreal.endec.Fragments.MainFragment
 import app.adreal.endec.Model.File
 import app.adreal.endec.R
 import app.adreal.endec.databinding.RecycleritemBinding
@@ -49,7 +50,7 @@ class MainAdapter(
         }
 
         holder.options.setOnClickListener{
-
+            MainFragment().showPopup(holder.options, context)
         }
     }
 
