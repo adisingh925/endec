@@ -113,4 +113,20 @@ class File {
         val digitGroups = (log10(size2.toDouble()) / log10(1024.0)).toInt()
         return DecimalFormat("#,##0.#").format(size2 / 1024.0.pow(digitGroups.toDouble())) + " " + units[digitGroups]
     }
+
+    fun deleteFile(context: Context, fileData : app.adreal.endec.Model.File){
+        CoroutineScope(Dispatchers.IO).launch {
+            val file = File(Constants.getFilesDirectoryPath(context), fileData.fileName)
+            if(file.exists()){
+                file.delete()
+            }
+        }
+    }
+
+    fun deleteCache(context: Context){
+        CoroutineScope(Dispatchers.IO).launch {
+            val file = File(context.cacheDir.path)
+            file.delete()
+        }
+    }
 }

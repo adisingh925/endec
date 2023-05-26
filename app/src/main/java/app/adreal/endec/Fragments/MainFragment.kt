@@ -3,37 +3,35 @@ package app.adreal.endec.Fragments
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.os.Build.DISPLAY
-import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.adreal.endec.Constants
-import app.adreal.endec.Encryption.Encryption
 import app.adreal.endec.File.File
 import app.adreal.endec.R
 import app.adreal.endec.RecyclerView.MainAdapter
 import app.adreal.endec.ViewModel.MainViewModel
 import app.adreal.endec.databinding.FragmentMainBinding
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 
 class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
@@ -53,11 +51,11 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
         context?.contentResolver
     }
 
-    private val adapter by lazy{
-        MainAdapter(requireContext(),this)
+    private val adapter by lazy {
+        MainAdapter(requireContext(), this)
     }
 
-    private val recyclerView by lazy{
+    private val recyclerView by lazy {
         binding.recyclerView
     }
 
@@ -69,13 +67,13 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
         initRecyclerView()
 
-        mainViewModel.filesData.observe(viewLifecycleOwner){
+        mainViewModel.filesData.observe(viewLifecycleOwner) {
             adapter.setData(it)
-            if(mainViewModel.filesList.isEmpty()){
-                adapter.notifyItemRangeInserted(0,it.size)
-            }else if(it.size != mainViewModel.filesList.size){
+            if (mainViewModel.filesList.isEmpty()) {
+                adapter.notifyItemRangeInserted(0, it.size)
+            } else if (it.size != mainViewModel.filesList.size) {
                 adapter.notifyItemInserted(0)
-                adapter.notifyItemRangeChanged(1,it.size)
+                adapter.notifyItemRangeChanged(1, it.size)
             }
 
             mainViewModel.filesList = it as MutableList<app.adreal.endec.Model.File>
@@ -89,7 +87,7 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
             openExplorer()
         }
 
-        binding.decrypt.setOnClickListener{
+        binding.decrypt.setOnClickListener {
 
         }
 
@@ -109,22 +107,40 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
                 adapter.notifyItemRemoved(viewHolder.adapterPosition)
                 mainViewModel.delete(deletedData)
 
-                Snackbar.make(binding.root, "Deleted " + deletedData.fileName, Snackbar.LENGTH_LONG)
-                    .setAction(
-                        "Undo"
-                    ) {
-                        mainViewModel.filesList.add(position,deletedData)
-                        adapter.setData(mainViewModel.filesList)
-                        adapter.notifyItemInserted(position)
-                        mainViewModel.add(deletedData)
-                    }.show()
+                val snackbar = Snackbar.make(
+                    binding.root,
+                    "Deleted " + deletedData.fileName,
+                    Snackbar.LENGTH_LONG
+                )
+
+                snackbar.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onShown(transientBottomBar: Snackbar?) {
+                        super.onShown(transientBottomBar)
+                    }
+
+                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        super.onDismissed(transientBottomBar, event)
+                        if(event == 2){
+                            File().deleteFile(requireContext(), deletedData)
+                        }
+                    }
+                })
+
+                snackbar.setAction(
+                    "Undo"
+                ) {
+                    mainViewModel.filesList.add(position, deletedData)
+                    adapter.setData(mainViewModel.filesList)
+                    adapter.notifyItemInserted(position)
+                    mainViewModel.add(deletedData)
+                }.show()
             }
         }).attachToRecyclerView(recyclerView)
 
         return binding.root
     }
 
-    private fun initRecyclerView(){
+    private fun initRecyclerView() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
     }
@@ -141,14 +157,14 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && requestCode == PICKFILE_REQUEST_CODE) {
             data?.data?.also { uri ->
-                File().readFile(uri,contentResolver!!,requireContext())
+                File().readFile(uri, contentResolver!!, requireContext())
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
     @RequiresApi(VERSION_CODES.O)
-    override fun onItemClick(fileData : app.adreal.endec.Model.File) {
+    override fun onItemClick(fileData: app.adreal.endec.Model.File) {
         CoroutineScope(Dispatchers.IO).launch {
             val intent = Intent(Intent.ACTION_VIEW)
                 .setDataAndType(
