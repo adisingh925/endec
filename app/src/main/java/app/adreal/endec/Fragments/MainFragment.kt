@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import app.adreal.endec.Constants
 import app.adreal.endec.Encryption.Encryption
 import app.adreal.endec.File.File
@@ -76,7 +77,7 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     private fun initRecyclerView(){
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(context,Constants.RECYCLERVIEW_SPAN_COUNT)
+        recyclerView.layoutManager = LinearLayoutManager(context)
     }
 
     private fun openExplorer() {

@@ -24,6 +24,8 @@ class MainAdapter(
 
     class MyViewHolder(binding: RecycleritemBinding) : RecyclerView.ViewHolder(binding.root) {
         val image = binding.recyclerItemImage
+        val text = binding.recyclerItemText
+        val size = binding.recyclerItemSize
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -36,6 +38,8 @@ class MainAdapter(
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        holder.text.text = filesList[position].fileName
+        holder.size.text = app.adreal.endec.File.File().fileSize(filesList[position].size.toInt())
         Glide.with(context).load(java.io.File(Constants.getFilesDirectoryPath(context), filesList[position].fileName)).centerCrop().into(holder.image)
 
         holder.itemView.setOnClickListener {
