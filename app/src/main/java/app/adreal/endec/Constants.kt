@@ -10,6 +10,7 @@ object Constants {
     const val PICKER_ID = "image/*"
     const val RECYCLERVIEW_SPAN_COUNT = 3
     const val TABLE_NAME = "FileTable"
+    const val PROVIDER = ".provider"
 
     fun getFilesDirectoryPath(context: Context) : String{
         return context.getExternalFilesDir("")?.path.toString()

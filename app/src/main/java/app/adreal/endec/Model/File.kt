@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class File(
     @PrimaryKey val id : String,
     val fileName : String,
-    val size : Long
+    val size : Long,
+    val extension : String
 )

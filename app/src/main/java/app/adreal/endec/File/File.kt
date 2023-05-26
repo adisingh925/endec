@@ -30,8 +30,8 @@ class File {
         const val SIZE = "Size"
     }
 
-    fun getMIMEType(uri: Uri, contentResolver: ContentResolver) {
-        Log.d(MIME_TYPE, contentResolver.getType(uri).toString())
+    private fun getMIMEType(uri: Uri, contentResolver: ContentResolver) : String {
+        return contentResolver.getType(uri).toString()
     }
 
     private fun dumpImageMetaData(uri: Uri, contentResolver: ContentResolver): metaData {
@@ -71,9 +71,13 @@ class File {
             }
         }.invokeOnCompletion {
             CoroutineScope(Dispatchers.IO).launch {
-                val fos = FileOutputStream(f)
                 if (inputStream != null) {
-                    Encryption(context).encryptUsingSymmetricKey(fos, inputStream.readBytes())
+                    withContext(Dispatchers.IO) {
+                        Encryption(context).encryptUsingSymmetricKey(
+                            FileOutputStream(f),
+                            inputStream.readBytes()
+                        )
+                    }
                 }
             }.invokeOnCompletion {
                 inputStream?.close()
@@ -81,7 +85,8 @@ class File {
                     app.adreal.endec.Model.File(
                         uri.lastPathSegment.toString(),
                         fileData.name,
-                        fileData.size
+                        fileData.size,
+                        getMIMEType(uri, contentResolver).substringAfterLast("/")
                     )
                 )
             }
@@ -89,9 +94,9 @@ class File {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun createTempFile(context: Context, fileName : String) : String{
-        val outputFile = File.createTempFile(fileName + "_decrypted", ".jpg", context.cacheDir)
-        val fos = FileInputStream(File(Constants.getFilesDirectoryPath(context), fileName))
+    fun createTempFile(context: Context, fileData : app.adreal.endec.Model.File) : String{
+        val outputFile = File.createTempFile(fileData.fileName + "_decrypted", ".${fileData.extension}", context.cacheDir)
+        val fos = FileInputStream(File(Constants.getFilesDirectoryPath(context), fileData.fileName))
         FileOutputStream(outputFile).use {
             it.write(Encryption(context).decryptUsingSymmetricKey(fos))
         }

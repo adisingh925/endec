@@ -19,7 +19,7 @@ class MainAdapter(
     private var filesList = emptyList<File>()
 
     interface OnItemClickListener {
-        fun onItemClick(fileName : String)
+        fun onItemClick(fileData : File)
     }
 
     class MyViewHolder(binding: RecycleritemBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -39,7 +39,7 @@ class MainAdapter(
         Glide.with(context).load(java.io.File(Constants.getFilesDirectoryPath(context), filesList[position].fileName)).centerCrop().into(holder.image)
 
         holder.itemView.setOnClickListener {
-            onItemClickListener.onItemClick(filesList[position].fileName)
+            onItemClickListener.onItemClick(filesList[position])
         }
     }
 

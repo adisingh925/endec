@@ -98,13 +98,13 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
     }
 
     @RequiresApi(VERSION_CODES.O)
-    override fun onItemClick(fileName : String) {
+    override fun onItemClick(fileData : app.adreal.endec.Model.File) {
         val intent = Intent(Intent.ACTION_VIEW)
             .setDataAndType(
                 FileProvider.getUriForFile(
                     requireContext(),
-                    (context?.packageName) + ".provider",
-                    java.io.File(File().createTempFile(requireContext(), fileName))
+                    (context?.packageName) + Constants.PROVIDER,
+                    java.io.File(File().createTempFile(requireContext(), fileData))
                 ),
                 Constants.PICKER_ID
             ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
