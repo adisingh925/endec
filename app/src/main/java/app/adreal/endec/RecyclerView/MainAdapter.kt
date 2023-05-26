@@ -55,6 +55,5 @@ class MainAdapter(
 
     fun setData(data: List<File>) {
         this.filesList = data
-        notifyDataSetChanged()
     }
 }

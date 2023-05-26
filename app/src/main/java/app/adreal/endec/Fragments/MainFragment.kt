@@ -66,9 +66,10 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
         mainViewModel.filesData.observe(viewLifecycleOwner){
             adapter.setData(it)
             if(mainViewModel.filesList.isEmpty()){
-                adapter.notifyItemRangeInserted(0,it.size - 1)
+                adapter.notifyItemRangeInserted(0,it.size)
             }else if(it.size != mainViewModel.filesList.size){
                 adapter.notifyItemInserted(0)
+                adapter.notifyItemRangeChanged(1,it.size)
             }
 
             mainViewModel.filesList = it as MutableList<app.adreal.endec.Model.File>
@@ -102,7 +103,7 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
                     .setAction(
                         "Undo"
                     ) {
-                        mainViewModel.filesList.add(deletedData)
+                        mainViewModel.filesList.add(position,deletedData)
                         adapter.setData(mainViewModel.filesList)
                         adapter.notifyItemInserted(position)
                         mainViewModel.add(deletedData)
