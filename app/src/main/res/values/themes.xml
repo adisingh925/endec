@@ -5,6 +5,7 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="icon_color">@color/black</item>
     </style>
 
     <style name="Theme.Endec" parent="Base.Theme.Endec" />

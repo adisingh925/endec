@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="heading_size">20sp</dimen>
+    <dimen name="sub_heading_size">15sp</dimen>
 </resources>

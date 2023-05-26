@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import app.adreal.endec.Constants
 import app.adreal.endec.Model.File
+import app.adreal.endec.R
 import app.adreal.endec.databinding.RecycleritemBinding
 import com.bumptech.glide.Glide
 
@@ -39,8 +40,8 @@ class MainAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.text.text = filesList[position].fileName
-        holder.size.text = app.adreal.endec.File.File().fileSize(filesList[position].size.toInt())
-        Glide.with(context).load(java.io.File(Constants.getFilesDirectoryPath(context), filesList[position].fileName)).centerCrop().into(holder.image)
+        holder.size.text = "${app.adreal.endec.File.File().fileSize(filesList[position].size.toInt())} / ${filesList[position].extension}"
+        Glide.with(context).load(R.drawable.encrypt).centerCrop().into(holder.image)
 
         holder.itemView.setOnClickListener {
             onItemClickListener.onItemClick(filesList[position])

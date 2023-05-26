@@ -73,7 +73,7 @@
     <string name="default_argon_version">1</string>
     <integer name="max_hash_length">1024</integer>
     <integer name="min_hash_length">32</integer>
-    <integer name="default_parallelism_value">2</integer>
+    <integer name="default_parallelism_value">4</integer>
     <integer name="max_parallelism_value">8</integer>
 
     <!-- keys -->
