@@ -24,7 +24,7 @@ interface Dao {
     @Query("DELETE FROM FileData")
     suspend fun deleteAll()
 
-    @Query("SELECT * from FileData")
+    @Query("SELECT * from FileData order by insertTime desc")
     fun readAll() : LiveData<List<File>>
 
 }

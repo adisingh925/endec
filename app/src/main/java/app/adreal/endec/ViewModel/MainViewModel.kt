@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     var filesData: LiveData<List<File>>
+    var filesList = mutableListOf<File>()
 
     private val repository: Repository
 
@@ -40,10 +41,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 //        )
 //    }
 
-    fun add(item: File)
-    {
+    fun add(item: File) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addUser(item)
+        }
+    }
+
+    fun delete(item: File) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.delete(item)
         }
     }
 }

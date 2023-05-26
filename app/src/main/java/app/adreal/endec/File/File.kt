@@ -89,7 +89,8 @@ class File {
                         uri.lastPathSegment.toString(),
                         fileData.name,
                         fileData.size,
-                        getMIMEType(uri, contentResolver).substringAfterLast("/")
+                        getMIMEType(uri, contentResolver).substringAfterLast("/"),
+                        System.currentTimeMillis()
                     )
                 )
             }

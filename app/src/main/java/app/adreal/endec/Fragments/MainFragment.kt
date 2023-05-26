@@ -16,7 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import app.adreal.endec.Constants
 import app.adreal.endec.Encryption.Encryption
 import app.adreal.endec.File.File
@@ -24,6 +26,7 @@ import app.adreal.endec.R
 import app.adreal.endec.RecyclerView.MainAdapter
 import app.adreal.endec.ViewModel.MainViewModel
 import app.adreal.endec.databinding.FragmentMainBinding
+import com.google.android.material.snackbar.Snackbar
 
 
 class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
@@ -62,6 +65,13 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
         mainViewModel.filesData.observe(viewLifecycleOwner){
             adapter.setData(it)
+            if(mainViewModel.filesList.isEmpty()){
+                adapter.notifyItemRangeInserted(0,it.size - 1)
+            }else if(it.size != mainViewModel.filesList.size){
+                adapter.notifyItemInserted(0)
+            }
+
+            mainViewModel.filesList = it as MutableList<app.adreal.endec.Model.File>
         }
 
         binding.settings.setOnClickListener {
@@ -71,6 +81,34 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
         binding.encrypt.setOnClickListener {
             openExplorer()
         }
+
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val deletedData = mainViewModel.filesList[viewHolder.adapterPosition]
+                val position = viewHolder.adapterPosition
+                mainViewModel.filesList.removeAt(viewHolder.adapterPosition)
+                adapter.notifyItemRemoved(viewHolder.adapterPosition)
+                mainViewModel.delete(deletedData)
+
+                Snackbar.make(binding.root, "Deleted " + deletedData.fileName, Snackbar.LENGTH_LONG)
+                    .setAction(
+                        "Undo"
+                    ) {
+                        mainViewModel.filesList.add(deletedData)
+                        adapter.setData(mainViewModel.filesList)
+                        adapter.notifyItemInserted(position)
+                        mainViewModel.add(deletedData)
+                    }.show()
+            }
+        }).attachToRecyclerView(recyclerView)
 
         return binding.root
     }

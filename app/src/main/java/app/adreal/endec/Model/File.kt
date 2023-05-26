@@ -8,5 +8,6 @@ data class File(
     @PrimaryKey val id : String,
     val fileName : String,
     val size : Long,
-    val extension : String
+    val extension : String,
+    val insertTime : Long
 )

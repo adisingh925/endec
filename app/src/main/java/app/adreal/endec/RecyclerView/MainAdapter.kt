@@ -27,6 +27,7 @@ class MainAdapter(
         val image = binding.recyclerItemImage
         val text = binding.recyclerItemText
         val size = binding.recyclerItemSize
+        val options = binding.options
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -45,6 +46,10 @@ class MainAdapter(
 
         holder.itemView.setOnClickListener {
             onItemClickListener.onItemClick(filesList[position])
+        }
+
+        holder.options.setOnClickListener{
+
         }
     }
 
