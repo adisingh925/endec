@@ -76,7 +76,7 @@
             app:title="@string/parallelism_title"
             android:summary="@string/parallelism_summary"
             app:defaultValue="@integer/default_parallelism_value"
-            app:min="@integer/default_parallelism_value"
+            app:min="@integer/min_parallelism_value"
             android:max="@integer/max_parallelism_value"
             app:showSeekBarValue="@bool/True"/>
 
