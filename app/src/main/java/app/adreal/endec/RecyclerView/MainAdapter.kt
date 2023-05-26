@@ -50,7 +50,7 @@ class MainAdapter(
         }
 
         holder.options.setOnClickListener{
-            MainFragment().showPopup(holder.options, context)
+            MainFragment().showPopup(holder.options, context, filesList[position].fileName)
         }
     }
 

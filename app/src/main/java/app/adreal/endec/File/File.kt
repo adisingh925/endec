@@ -41,8 +41,7 @@ class File {
         val cursor: Cursor? = contentResolver.query(uri, null, null, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
-                val displayName: String =
-                    it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                val displayName: String = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
                 Log.d(FILE_DATA, "$DISPLAY_NAME $displayName")
                 val sizeIndex: Int = it.getColumnIndex(OpenableColumns.SIZE)
                 val size: String = if (!it.isNull(sizeIndex)) {
@@ -51,7 +50,7 @@ class File {
                     "Unknown"
                 }
                 Log.d(FILE_DATA, "$SIZE $size")
-                fileData.name = displayName
+                fileData.name = displayName.substring(0,displayName.lastIndexOf('.'))
                 fileData.size = size.toLong()
             }
         }
@@ -64,7 +63,7 @@ class File {
         CoroutineScope(Dispatchers.IO).launch {
             val inputStream = contentResolver.openInputStream(uri)
             val fileData = dumpImageMetaData(uri, contentResolver)
-            val f = File(Constants.getFilesDirectoryPath(context), fileData.name)
+            val f = File(Constants.getFilesDirectoryPath(context), fileData.name + ".aes")
             val fos = FileOutputStream(f, true)
             val cos = Encryption(context).encryptUsingSymmetricKey(fos)
 
@@ -85,7 +84,7 @@ class File {
                     Database.getDatabase(context).dao().add(
                         app.adreal.endec.Model.File(
                             uri.lastPathSegment.toString(),
-                            fileData.name,
+                            fileData.name + ".aes",
                             fileData.size,
                             getMIMEType(uri, contentResolver).substringAfterLast("/"),
                             System.currentTimeMillis()
@@ -128,5 +127,9 @@ class File {
             val file = File(context.cacheDir.path)
             file.delete()
         }
+    }
+
+    fun getFileUri(contentResolver: ContentResolver){
+
     }
 }

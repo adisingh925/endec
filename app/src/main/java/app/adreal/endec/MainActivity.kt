@@ -3,7 +3,6 @@ package app.adreal.endec
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import app.adreal.endec.File.File
 import app.adreal.endec.FileObserver.FileObserver
 import app.adreal.endec.SharedPreferences.SharedPreferences
 

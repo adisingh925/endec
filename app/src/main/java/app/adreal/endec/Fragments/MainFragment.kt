@@ -5,14 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -179,10 +178,27 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
         }
     }
 
-    fun showPopup(v: View, context: Context) {
+    fun showPopup(v: View, context: Context, fileName : String) {
         val popup = PopupMenu(context, v)
         val inflater: MenuInflater = popup.menuInflater
         inflater.inflate(R.menu.menu, popup.menu)
         popup.show()
+
+        popup.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.share ->{
+                    val myIntent = Intent(Intent.ACTION_SEND)
+                    myIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    myIntent.type = "*/*"
+                    myIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(
+                        context,
+                        (context.packageName) + Constants.PROVIDER,
+                        java.io.File(Constants.getFilesDirectoryPath(context),fileName)
+                    ))
+                    startActivity(context, Intent.createChooser(myIntent, "Share Options"), null)
+                }
+            }
+            true
+        }
     }
 }
