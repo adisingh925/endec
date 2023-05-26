@@ -23,7 +23,6 @@ import java.text.DecimalFormat
 import kotlin.math.log10
 import kotlin.math.pow
 
-
 class File {
 
     companion object {
@@ -62,35 +61,37 @@ class File {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun readFile(uri: Uri, contentResolver: ContentResolver, context: Context) {
-        val inputStream = contentResolver.openInputStream(uri)
-        val fileData = dumpImageMetaData(uri, contentResolver)
-        val f = File(Constants.getFilesDirectoryPath(context), fileData.name)
-        val fos = FileOutputStream(f, true)
-        val cos = Encryption(context).encryptUsingSymmetricKey(fos)
-
         CoroutineScope(Dispatchers.IO).launch {
-            if (!f.exists()) {
-                withContext(Dispatchers.IO) {
-                    f.createNewFile()
+            val inputStream = contentResolver.openInputStream(uri)
+            val fileData = dumpImageMetaData(uri, contentResolver)
+            val f = File(Constants.getFilesDirectoryPath(context), fileData.name)
+            val fos = FileOutputStream(f, true)
+            val cos = Encryption(context).encryptUsingSymmetricKey(fos)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                if (!f.exists()) {
+                    withContext(Dispatchers.IO) {
+                        f.createNewFile()
+                    }
                 }
-            }
-        }.invokeOnCompletion {
-            try{
-                inputStream?.copyTo(cos)
-            }catch (e : Exception){
-                Log.d("File Write Exception",e.message.toString())
-            }finally {
-                inputStream?.close()
-                cos.close()
-                Database.getDatabase(context).dao().add(
-                    app.adreal.endec.Model.File(
-                        uri.lastPathSegment.toString(),
-                        fileData.name,
-                        fileData.size,
-                        getMIMEType(uri, contentResolver).substringAfterLast("/"),
-                        System.currentTimeMillis()
+            }.invokeOnCompletion {
+                try{
+                    inputStream?.copyTo(cos)
+                }catch (e : Exception){
+                    Log.d("File Write Exception",e.message.toString())
+                }finally {
+                    inputStream?.close()
+                    cos.close()
+                    Database.getDatabase(context).dao().add(
+                        app.adreal.endec.Model.File(
+                            uri.lastPathSegment.toString(),
+                            fileData.name,
+                            fileData.size,
+                            getMIMEType(uri, contentResolver).substringAfterLast("/"),
+                            System.currentTimeMillis()
+                        )
                     )
-                )
+                }
             }
         }
     }
