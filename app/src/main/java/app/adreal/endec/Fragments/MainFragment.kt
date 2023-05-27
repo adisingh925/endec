@@ -119,7 +119,7 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                         super.onDismissed(transientBottomBar, event)
-                        if(event == 2){
+                        if(event == 2 || event == 4){
                             File().deleteFile(requireContext(), deletedData)
                         }
                     }
