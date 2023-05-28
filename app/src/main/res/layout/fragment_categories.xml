@@ -15,8 +15,7 @@
         android:textSize="@dimen/heading_size"
         android:textStyle="bold"
         android:layout_marginTop="@dimen/medium_margin"
-        android:layout_marginStart="@dimen/medium_margin"
-        android:text="@string/encrypted_files"/>
+        android:layout_marginStart="@dimen/medium_margin" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categoriesRecyclerView"

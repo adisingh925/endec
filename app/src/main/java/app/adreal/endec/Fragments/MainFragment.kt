@@ -189,7 +189,7 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
     private fun createBundle(type: String): Bundle {
         val x = Bundle()
         x.putString("type",type)
-
+        x.putString("heading",type)
         return x
     }
 }

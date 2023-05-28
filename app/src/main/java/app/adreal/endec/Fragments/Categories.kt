@@ -33,19 +33,32 @@ class Categories : Fragment(), MainAdapter.OnItemClickListener {
         binding.categoriesRecyclerView
     }
 
+    private val type by lazy{
+        returnType()
+    }
+
+    private val heading by lazy{
+        arguments?.getString("heading")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
         initRecyclerView()
+        setTitle()
 
-        mainViewModel.readAllForExtension(returnType()).observe(viewLifecycleOwner){
+        mainViewModel.readAllForExtension(type).observe(viewLifecycleOwner){
             adapter.setData(it)
             adapter.notifyDataSetChanged()
         }
 
         return binding.root
+    }
+
+    private fun setTitle(){
+        binding.categoriesHeading.text = (heading?.capitalize() ?: "Encrypted") + " Files"
     }
 
     private fun initRecyclerView() {
