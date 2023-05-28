@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="heading_size">20sp</dimen>
+    <dimen name="categoriesCardRadius">20dp</dimen>
+    <dimen name="categoriesCardHeight">50dp</dimen>
 </resources>

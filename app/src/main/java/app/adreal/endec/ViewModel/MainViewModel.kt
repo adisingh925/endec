@@ -1,14 +1,10 @@
 package app.adreal.endec.ViewModel
 
 import android.app.Application
-import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import app.adreal.endec.Database.Database
-import app.adreal.endec.Encryption.Encryption
 import app.adreal.endec.Model.File
 import app.adreal.endec.Repository.Repository
 import kotlinx.coroutines.Dispatchers
@@ -27,19 +23,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         filesData = repository.readAll
     }
 
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    fun encryptData(data: ByteArray): ByteArray {
-//        return Encryption(getApplication<Application>().applicationContext).encryptUsingSymmetricKey(
-//            data
-//        )
-//    }
-//
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    fun decrypt(data: ByteArray): ByteArray {
-//        return Encryption(getApplication<Application>().applicationContext).decryptUsingSymmetricKey(
-//            data
-//        )
-//    }
+    fun readAllForExtension(mimeTypes : List<String>) : LiveData<List<File>>{
+        return repository.readAllForExtension(mimeTypes)
+    }
 
     fun add(item: File) {
         viewModelScope.launch(Dispatchers.IO) {

@@ -24,7 +24,9 @@ interface Dao {
     @Query("DELETE FROM FileData")
     suspend fun deleteAll()
 
-    @Query("SELECT * from FileData order by insertTime desc")
+    @Query("SELECT * from FileData order by insertTime desc limit 3")
     fun readAll() : LiveData<List<File>>
 
+    @Query("SELECT * from FileData where extension in (:mimeTypes) order by insertTime desc")
+    fun readAllForExtension(mimeTypes : List<String>) : LiveData<List<File>>
 }

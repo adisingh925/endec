@@ -26,7 +26,6 @@ import kotlin.math.pow
 class File {
 
     companion object {
-        const val MIME_TYPE = "MIME Type"
         const val FILE_DATA = "File Data"
         const val DISPLAY_NAME = "Display Name"
         const val SIZE = "Size"
@@ -63,7 +62,7 @@ class File {
         CoroutineScope(Dispatchers.IO).launch {
             val inputStream = contentResolver.openInputStream(uri)
             val fileData = dumpImageMetaData(uri, contentResolver)
-            val f = File(Constants.getFilesDirectoryPath(context), fileData.name + ".aes")
+            val f = File(Constants.getFilesDirectoryPath(context), fileData.name)
             val fos = FileOutputStream(f, true)
             val cos = Encryption(context).encryptUsingSymmetricKey(fos)
 
@@ -84,9 +83,9 @@ class File {
                     Database.getDatabase(context).dao().add(
                         app.adreal.endec.Model.File(
                             uri.lastPathSegment.toString(),
-                            fileData.name + ".aes",
+                            fileData.name,
                             fileData.size,
-                            getMIMEType(uri, contentResolver).substringAfterLast("/"),
+                            getMIMEType(uri, contentResolver),
                             System.currentTimeMillis()
                         )
                     )
@@ -97,7 +96,7 @@ class File {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun createTempFile(context: Context, fileData : app.adreal.endec.Model.File) : String{
-        val outputFile = File.createTempFile(fileData.fileName + "_decrypted", ".${fileData.extension}", context.cacheDir)
+        val outputFile = File.createTempFile(fileData.fileName + "_decrypted", ".${fileData.extension.substringAfter("/")}", Constants.getTempFileDirectory(context))
         val fis = FileInputStream(File(Constants.getFilesDirectoryPath(context), fileData.fileName))
         val cis = Encryption(context).decryptUsingSymmetricKey(fis)
         cis.copyTo(FileOutputStream(outputFile))
@@ -120,16 +119,5 @@ class File {
                 file.delete()
             }
         }
-    }
-
-    fun deleteCache(context: Context){
-        CoroutineScope(Dispatchers.IO).launch {
-            val file = File(context.cacheDir.path)
-            file.delete()
-        }
-    }
-
-    fun getFileUri(contentResolver: ContentResolver){
-
     }
 }

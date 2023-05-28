@@ -42,7 +42,7 @@ class MainAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.text.text = filesList[position].fileName
-        holder.size.text = "${app.adreal.endec.File.File().fileSize(filesList[position].size)} / ${filesList[position].extension}"
+        holder.size.text = "${app.adreal.endec.File.File().fileSize(filesList[position].size)} / ${filesList[position].extension.substringAfter("/")}"
         Glide.with(context).load(R.drawable.encrypt).centerCrop().into(holder.image)
 
         holder.itemView.setOnClickListener {
@@ -50,7 +50,7 @@ class MainAdapter(
         }
 
         holder.options.setOnClickListener{
-            MainFragment().showPopup(holder.options, context, filesList[position].fileName)
+            Constants.showPopup(holder.options, context, filesList[position])
         }
     }
 

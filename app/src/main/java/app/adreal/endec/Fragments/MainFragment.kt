@@ -1,18 +1,14 @@
 package app.adreal.endec.Fragments
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.startActivity
-import androidx.core.content.FileProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -27,9 +23,6 @@ import app.adreal.endec.ViewModel.MainViewModel
 import app.adreal.endec.databinding.FragmentMainBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
@@ -67,6 +60,8 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
         initRecyclerView()
 
         mainViewModel.filesData.observe(viewLifecycleOwner) {
+            binding.noFiles.isVisible = it.isEmpty()
+
             adapter.setData(it)
             if (mainViewModel.filesList.isEmpty()) {
                 adapter.notifyItemRangeInserted(0, it.size)
@@ -88,6 +83,30 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
         binding.decrypt.setOnClickListener {
 
+        }
+
+        binding.row1cardView1.setOnClickListener{
+            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("music"))
+        }
+
+        binding.row1cardView2.setOnClickListener{
+            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("video"))
+        }
+
+        binding.row2cardView1.setOnClickListener{
+            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("image"))
+        }
+
+        binding.row2cardView2.setOnClickListener{
+            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("document"))
+        }
+
+        binding.row3cardView1.setOnClickListener{
+            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("application"))
+        }
+
+        binding.row3cardView2.setOnClickListener{
+            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("miscellaneous"))
         }
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
@@ -164,41 +183,13 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     @RequiresApi(VERSION_CODES.O)
     override fun onItemClick(fileData: app.adreal.endec.Model.File) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val intent = Intent(Intent.ACTION_VIEW)
-                .setDataAndType(
-                    FileProvider.getUriForFile(
-                        requireContext(),
-                        (context?.packageName) + Constants.PROVIDER,
-                        java.io.File(File().createTempFile(requireContext(), fileData))
-                    ),
-                    Constants.PICKER_ID
-                ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            startActivity(intent)
-        }
+        Constants.openFile(requireContext(), fileData)
     }
 
-    fun showPopup(v: View, context: Context, fileName : String) {
-        val popup = PopupMenu(context, v)
-        val inflater: MenuInflater = popup.menuInflater
-        inflater.inflate(R.menu.menu, popup.menu)
-        popup.show()
+    private fun createBundle(type: String): Bundle {
+        val x = Bundle()
+        x.putString("type",type)
 
-        popup.setOnMenuItemClickListener {
-            when(it.itemId){
-                R.id.share ->{
-                    val myIntent = Intent(Intent.ACTION_SEND)
-                    myIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    myIntent.type = "*/*"
-                    myIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(
-                        context,
-                        (context.packageName) + Constants.PROVIDER,
-                        java.io.File(Constants.getFilesDirectoryPath(context),fileName)
-                    ))
-                    startActivity(context, Intent.createChooser(myIntent, "Share Options"), null)
-                }
-            }
-            true
-        }
+        return x
     }
 }
