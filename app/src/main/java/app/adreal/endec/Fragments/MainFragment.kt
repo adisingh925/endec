@@ -24,7 +24,6 @@ import app.adreal.endec.databinding.FragmentMainBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
-
 class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     companion object {
