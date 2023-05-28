@@ -43,7 +43,8 @@ object Constants {
         "video/mp4",
         "video/3gpp",
         "video/x-matroska",
-        "video/x-msvideo"
+        "video/x-msvideo",
+        "video/quicktime"
     )
 
     val audioMimeTypes = listOf(

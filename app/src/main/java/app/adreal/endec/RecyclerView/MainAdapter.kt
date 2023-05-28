@@ -43,7 +43,7 @@ class MainAdapter(
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.text.text = filesList[position].fileName
         holder.size.text = "${app.adreal.endec.File.File().fileSize(filesList[position].size)} / ${filesList[position].extension.substringAfter("/")}"
-        Glide.with(context).load(R.drawable.encrypt).centerCrop().into(holder.image)
+        Glide.with(context).load(R.drawable.encrypted).centerCrop().into(holder.image)
 
         holder.itemView.setOnClickListener {
             onItemClickListener.onItemClick(filesList[position])

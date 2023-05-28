@@ -3,4 +3,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="defaultDarkColor">#303030</color>
+    <color name="green">#B6E6BD</color>
+    <color name="violet">#AC9AF1</color>
+    <color name="orange">#F59A8E</color>
+    <color name="yellow">#FFEFB0</color>
+    <color name="pink">#F7C8EE</color>
+    <color name="light_orange">#FFCA96</color>
 </resources>

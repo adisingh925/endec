@@ -27,7 +27,8 @@ import com.google.android.material.snackbar.Snackbar
 class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     companion object {
-        const val PICKFILE_REQUEST_CODE = 10
+        const val ENCRYPT_REQUEST_CODE = 10
+        const val DECRYPT_REQUEST_CODE = 20
     }
 
     private val binding by lazy {
@@ -70,11 +71,11 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
         }
 
         binding.encrypt.setOnClickListener {
-            openExplorer()
+            openExplorer(ENCRYPT_REQUEST_CODE)
         }
 
         binding.decrypt.setOnClickListener {
-
+            openExplorer(DECRYPT_REQUEST_CODE)
         }
 
         binding.row1cardView1.setOnClickListener{
@@ -97,9 +98,9 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("application"))
         }
 
-//        binding.row3cardView2.setOnClickListener{
-//            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("miscellaneous"))
-//        }
+        binding.row3cardView2.setOnClickListener{
+            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("miscellaneous"))
+        }
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
             override fun onMove(
@@ -149,20 +150,22 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
         recyclerView.layoutManager = LinearLayoutManager(context)
     }
 
-    private fun openExplorer() {
+    private fun openExplorer(requestCode : Int) {
         val intent = Intent()
             .setType(Constants.PICKER_ID)
             .setAction(Intent.ACTION_GET_CONTENT)
 
-        startActivityForResult(intent, PICKFILE_REQUEST_CODE)
+        startActivityForResult(intent, requestCode)
     }
 
     @RequiresApi(VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK && requestCode == PICKFILE_REQUEST_CODE) {
+        if (resultCode == Activity.RESULT_OK && requestCode == ENCRYPT_REQUEST_CODE) {
             data?.data?.also { uri ->
                 File().readFile(uri, contentResolver!!, requireContext())
             }
+        }else if(resultCode == Activity.RESULT_OK && requestCode == DECRYPT_REQUEST_CODE){
+
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
