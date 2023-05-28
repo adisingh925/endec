@@ -4,10 +4,13 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +26,9 @@ import app.adreal.endec.ViewModel.MainViewModel
 import app.adreal.endec.databinding.FragmentMainBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
@@ -160,13 +166,30 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
     @RequiresApi(VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK && requestCode == ENCRYPT_REQUEST_CODE) {
-            data?.data?.also { uri ->
-                File().readFile(uri, contentResolver!!, requireContext())
-            }
-        }else if(resultCode == Activity.RESULT_OK && requestCode == DECRYPT_REQUEST_CODE){
+        data?.data?.also {
+            if (resultCode == Activity.RESULT_OK && requestCode == ENCRYPT_REQUEST_CODE) {
+                File().readFile(it, contentResolver!!, requireContext())
+            }else if(resultCode == Activity.RESULT_OK && requestCode == DECRYPT_REQUEST_CODE){
+                val path = File().decryptAndStoreInCache(it, contentResolver!!, requireContext())
+                Log.d("path",path)
 
+                CoroutineScope(Dispatchers.IO).launch {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(
+                            FileProvider.getUriForFile(
+                                requireContext(),
+                                (context?.packageName) + Constants.PROVIDER,
+                                java.io.File(
+                                    path
+                                )
+                            ),
+                            "*/*"
+                        ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    ContextCompat.startActivity(requireContext(), intent, null)
+                }
+            }
         }
+
         super.onActivityResult(requestCode, resultCode, data)
     }
 

@@ -34,17 +34,22 @@ class Encryption(private val context: Context) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun encryptUsingSymmetricKey(fos: FileOutputStream) : CipherOutputStream {
-        val cipher = Cipher.getInstance(TRANSFORMATION_AES)
-        cipher.init(Cipher.ENCRYPT_MODE, generateKeyFromArgon(), getIV())
+    fun encryptUsingSymmetricKey(fos: FileOutputStream, cipher: Cipher) : CipherOutputStream {
         return CipherOutputStream(fos,cipher)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun decryptUsingSymmetricKey(fis : FileInputStream) : CipherInputStream {
-        val cipher = Cipher.getInstance(TRANSFORMATION_AES)
-        cipher.init(Cipher.DECRYPT_MODE, generateKeyFromArgon(), getIV())
+    fun decryptUsingSymmetricKey(fis : FileInputStream, cipher : Cipher) : CipherInputStream {
+//        val cipher = Cipher.getInstance(TRANSFORMATION_AES)
+//        cipher.init(Cipher.DECRYPT_MODE, generateKeyFromArgon(), getIV())
         return CipherInputStream(fis,cipher)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCipher(mode : Int) : Cipher{
+        val cipher = Cipher.getInstance(TRANSFORMATION_AES)
+        cipher.init(mode, generateKeyFromArgon(), getIV())
+        return cipher
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

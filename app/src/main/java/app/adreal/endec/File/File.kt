@@ -20,6 +20,9 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.DecimalFormat
+import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.CipherOutputStream
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -64,7 +67,7 @@ class File {
             val fileData = dumpImageMetaData(uri, contentResolver)
             val f = File(Constants.getFilesDirectoryPath(context), fileData.name)
             val fos = FileOutputStream(f, true)
-            val cos = Encryption(context).encryptUsingSymmetricKey(fos)
+            val cos = Encryption(context).encryptUsingSymmetricKey(fos, Encryption(context).getCipher(Cipher.ENCRYPT_MODE))
 
             CoroutineScope(Dispatchers.IO).launch {
                 if (!f.exists()) {
@@ -98,10 +101,25 @@ class File {
     fun createTempFile(context: Context, fileData : app.adreal.endec.Model.File) : String{
         val outputFile = File.createTempFile(fileData.fileName + "_decrypted", ".${fileData.extension.substringAfter("/")}", Constants.getTempFileDirectory(context))
         val fis = FileInputStream(File(Constants.getFilesDirectoryPath(context), fileData.fileName))
-        val cis = Encryption(context).decryptUsingSymmetricKey(fis)
+        val cis = Encryption(context).decryptUsingSymmetricKey(fis, Encryption(context).getCipher(Cipher.DECRYPT_MODE))
         cis.copyTo(FileOutputStream(outputFile))
         cis.close()
         fis.close()
+        return outputFile.path
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun decryptAndStoreInCache(uri: Uri, contentResolver: ContentResolver, context: Context) : String{
+        val fileData = dumpImageMetaData(uri, contentResolver)
+        val outputFile = File.createTempFile(
+            fileData.name + "_decrypted",
+            ".jpg",
+            Constants.getTempFileDirectory(context)
+        )
+        val fos = FileOutputStream(outputFile)
+        val cis = CipherOutputStream(fos,Encryption(context).getCipher(Cipher.DECRYPT_MODE))
+        contentResolver.openInputStream(uri)?.copyTo(cis)
+
         return outputFile.path
     }
 
