@@ -60,15 +60,8 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
         mainViewModel.filesData.observe(viewLifecycleOwner) {
             binding.noFiles.isVisible = it.isEmpty()
-
             adapter.setData(it)
-            if (mainViewModel.filesList.isEmpty()) {
-                adapter.notifyItemRangeInserted(0, it.size)
-            } else if (it.size != mainViewModel.filesList.size) {
-                adapter.notifyItemInserted(0)
-                adapter.notifyItemRangeChanged(1, it.size)
-            }
-
+            adapter.notifyDataSetChanged()
             mainViewModel.filesList = it as MutableList<app.adreal.endec.Model.File>
         }
 
@@ -119,9 +112,6 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val deletedData = mainViewModel.filesList[viewHolder.adapterPosition]
-                val position = viewHolder.adapterPosition
-                mainViewModel.filesList.removeAt(viewHolder.adapterPosition)
-                adapter.notifyItemRemoved(viewHolder.adapterPosition)
                 mainViewModel.delete(deletedData)
 
                 val snackbar = Snackbar.make(
@@ -146,9 +136,6 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
                 snackbar.setAction(
                     "Undo"
                 ) {
-                    mainViewModel.filesList.add(position, deletedData)
-                    adapter.setData(mainViewModel.filesList)
-                    adapter.notifyItemInserted(position)
                     mainViewModel.add(deletedData)
                 }.show()
             }
