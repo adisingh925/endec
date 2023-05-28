@@ -97,9 +97,9 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("application"))
         }
 
-        binding.row3cardView2.setOnClickListener{
-            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("miscellaneous"))
-        }
+//        binding.row3cardView2.setOnClickListener{
+//            findNavController().navigate(R.id.action_mainFragment_to_categories, createBundle("miscellaneous"))
+//        }
 
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
             override fun onMove(

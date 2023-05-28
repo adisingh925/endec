@@ -76,10 +76,6 @@ object Constants {
         return context.getExternalFilesDir("")?.path.toString()
     }
 
-    fun getTempFileName() {
-
-    }
-
     fun getTempFileDirectory(context: Context): File {
         return context.cacheDir
     }
@@ -124,11 +120,11 @@ object Constants {
                     FileProvider.getUriForFile(
                         context,
                         (context.packageName) + PROVIDER,
-                        java.io.File(
+                        File(
                             app.adreal.endec.File.File().createTempFile(context, fileData)
                         )
                     ),
-                    PICKER_ID
+                    fileData.extension
                 ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             startActivity(context, intent, null)
         }
