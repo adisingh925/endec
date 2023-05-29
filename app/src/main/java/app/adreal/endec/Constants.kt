@@ -81,22 +81,31 @@ object Constants {
         return context.cacheDir
     }
 
-    private fun share(context: Context, fileName: String, type: String) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun share(context: Context, fileData: app.adreal.endec.Model.File) {
         CoroutineScope(Dispatchers.IO).launch {
-            val myIntent = Intent(Intent.ACTION_SEND)
-            myIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            myIntent.type = type
-            myIntent.putExtra(
-                Intent.EXTRA_STREAM, FileProvider.getUriForFile(
-                    context,
-                    (context.packageName) + PROVIDER,
-                    File(getFilesDirectoryPath(context), fileName)
+            if (!fileData.isParametersAppended) {
+                app.adreal.endec.File.File()
+                    .appendTheDataToTheEnd(File(getFilesDirectoryPath(context), fileData.fileName))
+            }
+        }.invokeOnCompletion {
+            CoroutineScope(Dispatchers.IO).launch {
+                val myIntent = Intent(Intent.ACTION_SEND)
+                myIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                myIntent.type = fileData.mimeType
+                myIntent.putExtra(
+                    Intent.EXTRA_STREAM, FileProvider.getUriForFile(
+                        context,
+                        (context.packageName) + PROVIDER,
+                        File(getFilesDirectoryPath(context), fileData.fileName)
+                    )
                 )
-            )
-            startActivity(context, Intent.createChooser(myIntent, "Share Options"), null)
+                startActivity(context, Intent.createChooser(myIntent, "Share Options"), null)
+            }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun showPopup(v: View, context: Context, fileData: app.adreal.endec.Model.File) {
         val popup = PopupMenu(context, v)
         val inflater: MenuInflater = popup.menuInflater
@@ -106,7 +115,7 @@ object Constants {
         popup.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.share -> {
-                    share(context, fileData.fileName, fileData.extension)
+                    share(context, fileData)
                 }
             }
             true
@@ -125,7 +134,7 @@ object Constants {
                             app.adreal.endec.File.File().createTempFile(context, fileData)
                         )
                     ),
-                    fileData.extension
+                    fileData.mimeType
                 ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             startActivity(context, intent, null)
         }

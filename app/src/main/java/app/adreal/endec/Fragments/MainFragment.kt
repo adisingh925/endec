@@ -170,23 +170,8 @@ class MainFragment : Fragment(), MainAdapter.OnItemClickListener {
             if (resultCode == Activity.RESULT_OK && requestCode == ENCRYPT_REQUEST_CODE) {
                 File().readFile(it, contentResolver!!, requireContext())
             }else if(resultCode == Activity.RESULT_OK && requestCode == DECRYPT_REQUEST_CODE){
-                val path = File().decryptAndStoreInCache(it, contentResolver!!, requireContext())
+                val path = File().storeInStorage(it, contentResolver!!, requireContext())
                 Log.d("path",path)
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    val intent = Intent(Intent.ACTION_VIEW)
-                        .setDataAndType(
-                            FileProvider.getUriForFile(
-                                requireContext(),
-                                (context?.packageName) + Constants.PROVIDER,
-                                java.io.File(
-                                    path
-                                )
-                            ),
-                            "*/*"
-                        ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    ContextCompat.startActivity(requireContext(), intent, null)
-                }
             }
         }
 

@@ -1,5 +1,6 @@
 package app.adreal.endec.File
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
@@ -13,6 +14,7 @@ import app.adreal.endec.Database.Database
 import app.adreal.endec.Encryption.Encryption
 import app.adreal.endec.Model.KDFParameters
 import app.adreal.endec.Model.metaData
+import app.adreal.endec.R
 import app.adreal.endec.SharedPreferences.SharedPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,13 +42,13 @@ class File {
         return contentResolver.getType(uri).toString()
     }
 
+    @SuppressLint("Range")
     private fun dumpImageMetaData(uri: Uri, contentResolver: ContentResolver): metaData {
-        val fileData = metaData("", 0)
+        val fileData = metaData("", 0, "")
         val cursor: Cursor? = contentResolver.query(uri, null, null, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
-                val displayName: String =
-                    it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                val displayName: String = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
                 Log.d(FILE_DATA, "$DISPLAY_NAME $displayName")
                 val sizeIndex: Int = it.getColumnIndex(OpenableColumns.SIZE)
                 val size: String = if (!it.isNull(sizeIndex)) {
@@ -90,14 +92,42 @@ class File {
                 } finally {
                     inputStream?.close()
                     cos.close()
-                    appendTheDataToTheEnd(file)
                     Database.getDatabase(context).dao().add(
                         app.adreal.endec.Model.File(
                             uri.lastPathSegment.toString(),
+                            true,
                             fileData.name,
                             fileData.size,
                             getMIMEType(uri, contentResolver),
-                            System.currentTimeMillis()
+                            System.currentTimeMillis(),
+                            SharedPreferences.read(
+                                context.resources.getString(R.string.salt),
+                                context.resources.getString(R.string.default_salt)
+                            ).toString(),
+                            SharedPreferences.read(
+                                context.resources.getString(R.string.iteration),
+                                context.resources.getInteger(R.integer.default_iteration)
+                            ).toString(),
+                            SharedPreferences.read(
+                                context.resources.getString(R.string.memory_cost),
+                                context.resources.getInteger(R.integer.default_memory_cost)
+                            ).toString(),
+                            SharedPreferences.read(
+                                context.resources.getString(R.string.hash),
+                                context.resources.getInteger(R.integer.min_hash_length)
+                            ).toString(),
+                            SharedPreferences.read(
+                                context.resources.getString(R.string.version),
+                                context.resources.getString(R.string.default_argon_version)
+                            ).toString(),
+                            SharedPreferences.read(
+                                context.resources.getString(R.string.mode),
+                                context.resources.getString(R.string.default_argon_mode)
+                            ).toString(),
+                            SharedPreferences.read(
+                                context.resources.getString(R.string.parallelism),
+                                context.resources.getInteger(R.integer.default_parallelism_value)
+                            ).toString()
                         )
                     )
                 }
@@ -106,7 +136,7 @@ class File {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun appendTheDataToTheEnd(file: File) {
+    fun appendTheDataToTheEnd(file: File) {
         CoroutineScope(Dispatchers.IO).launch {
             val salt = SharedPreferences.read("salt", "").toString()
             val iteration = SharedPreferences.read("iteration", 0).toString().padStart(6, '0')
@@ -129,7 +159,7 @@ class File {
     fun createTempFile(context: Context, fileData: app.adreal.endec.Model.File): String {
         val outputFile = File.createTempFile(
             fileData.fileName + "_decrypted",
-            ".${fileData.extension.substringAfter("/")}",
+            ".${fileData.mimeType.substringAfter("/")}",
             Constants.getTempFileDirectory(context)
         )
         val file = File(Constants.getFilesDirectoryPath(context), fileData.fileName)
@@ -138,7 +168,15 @@ class File {
             fis,
             Encryption(context).getCipher(
                 Cipher.DECRYPT_MODE,
-                readTheEndOfFile(file)
+                KDFParameters(
+                    fileData.salt,
+                    fileData.iteration,
+                    fileData.memoryCost,
+                    fileData.hashLength,
+                    fileData.version,
+                    fileData.mode,
+                    fileData.parallelism
+                )
             )
         )
         cis.copyTo(FileOutputStream(outputFile))
@@ -180,28 +218,42 @@ class File {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun decryptAndStoreInCache(
+    fun storeInStorage(
         uri: Uri,
         contentResolver: ContentResolver,
         context: Context
     ): String {
-        val fileData = dumpImageMetaData(uri, contentResolver)
-
-        val outputFile = File.createTempFile(
-            fileData.name + "_decrypted",
-            ".jpg",
-            Constants.getTempFileDirectory(context)
-        )
-
-        val fos = FileOutputStream(outputFile)
-        val cis = CipherOutputStream(fos, Encryption(context).getCipher(Cipher.DECRYPT_MODE))
         val inputStream = contentResolver.openInputStream(uri)
+        val fileData = dumpImageMetaData(uri, contentResolver)
+        val file = File(Constants.getFilesDirectoryPath(context), fileData.name)
+        val fos = FileOutputStream(file)
 
-        readTheEndOfFile(File(uri.path.toString()))
+        try {
+            inputStream?.copyTo(fos)
+        }catch (e : java.lang.Exception){
+            Log.d("File Write Exception", e.message.toString())
+        }finally {
+            val data = readTheEndOfFile(File(Constants.getFilesDirectoryPath(context), fileData.name))
+            Database.getDatabase(context).dao().add(
+                app.adreal.endec.Model.File(
+                    uri.lastPathSegment.toString(),
+                    false,
+                    fileData.name,
+                    fileData.size,
+                    getMIMEType(uri, contentResolver),
+                    System.currentTimeMillis(),
+                    data.salt,
+                    data.iteration,
+                    data.memoryCost,
+                    data.hashLength,
+                    data.version,
+                    data.mode,
+                    data.parallelism
+                )
+            )
+        }
 
-        inputStream?.copyTo(cis)
-
-        return outputFile.path
+        return file.path
     }
 
     fun fileSize(size2: Long): String {
