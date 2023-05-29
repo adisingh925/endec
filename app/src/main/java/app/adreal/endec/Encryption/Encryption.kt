@@ -3,7 +3,9 @@ package app.adreal.endec.Encryption
 import android.content.Context
 import android.os.Build
 import android.security.keystore.KeyProperties
+import android.util.Log
 import androidx.annotation.RequiresApi
+import app.adreal.endec.Model.KDFParameters
 import app.adreal.endec.R
 import app.adreal.endec.SharedPreferences.SharedPreferences
 import com.lambdapioneer.argon2kt.Argon2Kt
@@ -34,27 +36,73 @@ class Encryption(private val context: Context) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun encryptUsingSymmetricKey(fos: FileOutputStream, cipher: Cipher) : CipherOutputStream {
-        return CipherOutputStream(fos,cipher)
+    fun encryptUsingSymmetricKey(fos: FileOutputStream, cipher: Cipher): CipherOutputStream {
+        return CipherOutputStream(fos, cipher)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun decryptUsingSymmetricKey(fis : FileInputStream, cipher : Cipher) : CipherInputStream {
-//        val cipher = Cipher.getInstance(TRANSFORMATION_AES)
-//        cipher.init(Cipher.DECRYPT_MODE, generateKeyFromArgon(), getIV())
-        return CipherInputStream(fis,cipher)
+    fun decryptUsingSymmetricKey(fis: FileInputStream, cipher: Cipher): CipherInputStream {
+        return CipherInputStream(fis, cipher)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getCipher(mode : Int) : Cipher{
+    fun getCipher(
+        mode: Int, argonParameters: KDFParameters = KDFParameters(
+            SharedPreferences.read(
+                context.resources.getString(R.string.salt),
+                context.resources.getString(R.string.default_salt)
+            ).toString(),
+            SharedPreferences.read(
+                context.resources.getString(R.string.iteration),
+                context.resources.getInteger(R.integer.default_iteration)
+            ).toString(),
+            SharedPreferences.read(
+                context.resources.getString(R.string.memory_cost),
+                context.resources.getInteger(R.integer.default_memory_cost)
+            ).toString(),
+            SharedPreferences.read(
+                context.resources.getString(R.string.hash),
+                context.resources.getInteger(R.integer.min_hash_length)
+            ).toString(),
+            SharedPreferences.read(
+                context.resources.getString(R.string.version),
+                context.resources.getString(R.string.default_argon_version)
+            ).toString(),
+            SharedPreferences.read(
+                context.resources.getString(R.string.mode),
+                context.resources.getString(R.string.default_argon_mode)
+            ).toString(),
+            SharedPreferences.read(
+                context.resources.getString(R.string.parallelism),
+                context.resources.getInteger(R.integer.default_parallelism_value)
+            ).toString()
+        )
+    ): Cipher {
         val cipher = Cipher.getInstance(TRANSFORMATION_AES)
-        cipher.init(mode, generateKeyFromArgon(), getIV())
+        cipher.init(
+            mode,
+            generateKeyFromArgon(
+                argonParameters.mode.toInt(),
+                argonParameters.salt.encodeToByteArray(),
+                argonParameters.memoryCost.toInt(),
+                argonParameters.iteration.toInt(),
+                argonParameters.version.toInt(),
+                argonParameters.hashLength.toInt(),
+                argonParameters.parallelism.toInt()
+            ),
+            getIV()
+        )
         return cipher
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getIV() : IvParameterSpec{
-        return IvParameterSpec(SharedPreferences.read(context.resources.getString(R.string.iv),context.getString(R.string.default_iv)).toString().encodeToByteArray())
+    fun getIV(): IvParameterSpec {
+        return IvParameterSpec(
+            SharedPreferences.read(
+                context.resources.getString(R.string.iv),
+                context.getString(R.string.default_iv)
+            ).toString().encodeToByteArray()
+        )
     }
 
     private fun generateArgon2Hash(
@@ -63,9 +111,9 @@ class Encryption(private val context: Context) {
         saltByteArray: ByteArray,
         memoryCost: Int,
         iteration: Int,
-        version : Argon2Version,
-        hashLength : Int,
-        parallelism : Int
+        version: Argon2Version,
+        hashLength: Int,
+        parallelism: Int
     ): Argon2KtResult {
         return argon2.hash(
             mode = argonMode,
@@ -84,19 +132,35 @@ class Encryption(private val context: Context) {
         return SecretKeySpec(keyBytes, ENCRYPTION_ALGORITHM)
     }
 
-    private fun generateKeyFromArgon(): SecretKey {
-        return generateAESKeyFromHash(
+    private fun generateKeyFromArgon(
+        argon2Mode: Int,
+        salt: ByteArray,
+        memoryCost: Int,
+        iteration: Int,
+        argon2Version: Int,
+        hashLength: Int,
+        parallelism: Int
+    ): SecretKey {
+        Log.d(
+            "data",
+            argon2Mode.toString() + " " + salt.decodeToString() + " " + memoryCost.toString() + " " + iteration.toString() + " " + argon2Version.toString() + " " + hashLength.toString() + " " + parallelism.toString()
+        )
+        val x = generateAESKeyFromHash(
             generateArgon2Hash(
-                getArgonMode(),
+                getArgonMode(argon2Mode),
                 getPassword(),
-                getSalt(),
-                getMemoryCost(),
-                getIteration(),
-                getArgonVersion(),
-                getHashLength(),
-                getParallelismValue()
+                salt,
+                memoryCost,
+                iteration,
+                getArgonVersion(argon2Version),
+                hashLength,
+                parallelism
             ).rawHashAsHexadecimal(true)
         )
+
+        Log.d("key",x.encoded.decodeToString())
+
+        return x
     }
 
     private fun getPassword(): ByteArray {
@@ -106,61 +170,75 @@ class Encryption(private val context: Context) {
         ).toString().encodeToByteArray()
     }
 
-    private fun getSalt(): ByteArray {
-        return SharedPreferences.read(
+    private fun getSalt(
+        salt: ByteArray = SharedPreferences.read(
             context.resources.getString(R.string.salt),
             context.resources.getString(R.string.default_salt)
         ).toString().encodeToByteArray()
+    ): ByteArray {
+        return salt
     }
 
-    private fun getIteration(): Int {
-        return SharedPreferences.read(
+    private fun getIteration(
+        iteration: Int = SharedPreferences.read(
             context.resources.getString(R.string.iteration),
             context.resources.getInteger(R.integer.default_iteration)
         ).toString().toInt()
+    ): Int {
+        return iteration
     }
 
-    private fun getMemoryCost(): Int {
-        return SharedPreferences.read(
+    private fun getMemoryCost(
+        memoryCost: Int = SharedPreferences.read(
             context.resources.getString(R.string.memory_cost),
             context.resources.getInteger(R.integer.default_memory_cost)
         ).toString().toInt()
+    ): Int {
+        return memoryCost
     }
 
-    private fun getArgonMode() : Argon2Mode{
-        return when (SharedPreferences.read(
+    private fun getArgonMode(
+        mode: Int = SharedPreferences.read(
             context.resources.getString(R.string.mode),
             context.resources.getString(R.string.default_argon_mode)
-        ).toString().toInt()) {
-            0 -> Argon2Mode.ARGON2_D
-            1 -> Argon2Mode.ARGON2_I
-            2 -> Argon2Mode.ARGON2_ID
-            else -> Argon2Mode.ARGON2_D
+        ).toString().toInt()
+    ): Argon2Mode {
+        return when (mode) {
+            1 -> Argon2Mode.ARGON2_D
+            2 -> Argon2Mode.ARGON2_I
+            3 -> Argon2Mode.ARGON2_ID
+            else -> Argon2Mode.ARGON2_ID
         }
     }
 
-    private fun getArgonVersion() : Argon2Version{
-        return when (SharedPreferences.read(
+    private fun getArgonVersion(
+        argon2Version: Int = SharedPreferences.read(
             context.resources.getString(R.string.version),
             context.resources.getString(R.string.default_argon_version)
-        ).toString().toInt()) {
-            0 -> Argon2Version.V10
-            1 -> Argon2Version.V13
+        ).toString().toInt()
+    ): Argon2Version {
+        return when (argon2Version) {
+            1 -> Argon2Version.V10
+            2 -> Argon2Version.V13
             else -> Argon2Version.V13
         }
     }
 
-    private fun getHashLength() : Int{
-        return SharedPreferences.read(
+    private fun getHashLength(
+        hashLength: Int = SharedPreferences.read(
             context.resources.getString(R.string.hash),
             context.resources.getInteger(R.integer.min_hash_length)
         ).toString().toInt()
+    ): Int {
+        return hashLength
     }
 
-    private fun getParallelismValue() : Int{
-        return SharedPreferences.read(
+    private fun getParallelismValue(
+        parallelism: Int = SharedPreferences.read(
             context.resources.getString(R.string.parallelism),
             context.resources.getInteger(R.integer.default_parallelism_value)
         ).toString().toInt()
+    ): Int {
+        return parallelism
     }
 }

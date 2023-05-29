@@ -42,6 +42,7 @@
             app:key="@string/salt"
             app:defaultValue="@string/default_salt"
             app:title="@string/salt_title"
+            app:enabled="@bool/False"
             app:useSimpleSummaryProvider="@bool/True" />
 
         <SeekBarPreference

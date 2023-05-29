@@ -42,9 +42,9 @@
     </string-array>
 
     <string-array name="argon_mode_value">
-        <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
 
     <string-array name="argon_version">
@@ -53,8 +53,8 @@
     </string-array>
 
     <string-array name="argon_version_value">
-        <item>0</item>
         <item>1</item>
+        <item>2</item>
     </string-array>
 
     <!-- Important -->
@@ -63,12 +63,12 @@
     <string name="default_password">password</string>
     <string name="default_salt">0123456789abcdef</string>
     <integer name="default_algorithm">0</integer>
-    <string name="default_argon_mode">2</string>
+    <string name="default_argon_mode">3</string>
     <integer name="maximum_memory_cost">131072</integer>
     <integer name="maximum_iteration">100</integer>
     <string name="default_iv">0123456789abcdef</string>
     <string name="default_hash_length">32</string>
-    <string name="default_argon_version">1</string>
+    <string name="default_argon_version">2</string>
     <integer name="max_hash_length">1024</integer>
     <integer name="min_hash_length">32</integer>
     <integer name="default_parallelism_value">4</integer>
